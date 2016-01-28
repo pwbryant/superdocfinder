@@ -4,8 +4,14 @@
 	</head>
 	<body>
 		<h1>Document Search Tool</h1>
-		<input id="id_search_term" placeholder="Enter search term(s)" />
+		<form method="POST">
+			<input name="search_term_text" id="id_search_term" placeholder="Enter search term(s)" />
+			{% csrf_token %}
+		</form>
+
 		<table id="id_results_table">
+			<tr><td>{{ search_term_text }} result<td></tr>
 		</table>
 	</body>
 </html>
+

@@ -37,21 +37,26 @@ class NewVisitorTest(unittest.TestCase):
 
         table = self.browser.find_element_by_id('id_results_table')
         rows = table.find_elements_by_tag_name('tr')
-        self.assertTrue(
-                any(row.text == 'atrazine result' for row in rows),
-                "Results not returned to table"
-                )
+        self.assertIn('atrazine result', [row.text for row in rows])
+                
 
         #Page Title and search bar are still there. User wants to search
         #for all papers regarding Iowa, because Waterborne carries out 
         #a lot of research there. They enter 'Iowa' and hit enter
-        self.fail('Finish the test')
-
+        inputbox = self.browser.find_element_by_id('id_search_term')
+        inputbox.send_keys('Iowa')
+        inputbox.send_keys(Keys.ENTER)
+        
         #The page updates again with the new results
+        table = self.browser.find_element_by_id('id_results_table')
+        rows = table.find_elements_by_tag_name('tr')
+        self.assertIn('Iowa result',[row.text for row in rows])
 
         #The User sees a document they are interested in and so they
         #click on a result, whereupon the document is downloaded to their
         #local computer
+
+        self.fail('Finish the test')
 
 if __name__ == '__main__':
     unittest.main(warnings='ignore')
