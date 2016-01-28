@@ -44,6 +44,7 @@ class NewVisitorTest(unittest.TestCase):
         inputbox.send_keys(Keys.ENTER)
         self.check_for_row_in_results_table('atrazine result')
 
+        self.fail('Finish the test')
         #Page Title and search bar are still there. User wants to search
         #for all papers regarding Iowa, because Waterborne carries out 
         #a lot of research there. They enter 'Iowa' and hit enter
@@ -58,7 +59,6 @@ class NewVisitorTest(unittest.TestCase):
         #click on a result, whereupon the document is downloaded to their
         #local computer
 
-        self.fail('Finish the test')
 
 if __name__ == '__main__':
     unittest.main(warnings='ignore')
