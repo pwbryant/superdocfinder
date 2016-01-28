@@ -19,9 +19,9 @@ class NewVisitorTest(unittest.TestCase):
         self.browser.implicitly_wait(3)
         #She notice the tile 'Document Finder' and a
         #a search bar
-        self.assertIn('Search Documents',self.browser.title)
+        self.assertIn('Waterborne-env Docfinder',self.browser.title)
         header_text = self.browser.find_element_by_tag_name('h1').text
-        self.assertIn('Search Documents',header_text)
+        self.assertIn('Document Search Tool',header_text)
         inputbox = self.browser.find_element_by_id('id_search_term')
         self.assertEqual(
                 inputbox.get_attribute('placeholder'),
@@ -38,7 +38,8 @@ class NewVisitorTest(unittest.TestCase):
         table = self.browser.find_element_by_id('id_results_table')
         rows = table.find_elements_by_tag_name('tr')
         self.assertTrue(
-                any(row.text == 'atrazine result' for row in rows)
+                any(row.text == 'atrazine result' for row in rows),
+                "Results not returned to table"
                 )
 
         #Page Title and search bar are still there. User wants to search
