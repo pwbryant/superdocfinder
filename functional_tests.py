@@ -20,5 +20,18 @@ class NewVisitorTest(unittest.TestCase):
         self.assertIn('Search Documents',self.browser.title)
         self.fail('Finish the test!')
 
+        #she types in 'atrazine' and hits enter to get all docs regarding 
+        #atrazine. The page is updated with the returned results. 
+        
+        #Page Title and search bar are still there. User wants to search
+        #for all papers regarding Iowa, because Waterborne carries out 
+        #a lot of research there. They enter 'Iowa' and hit enter
+
+        #The page updates again with the new results
+
+        #The User sees a document they are interested in and so they
+        #click on a result, whereupon the document is downloaded to their
+        #local computer
+
 if __name__ == '__main__':
     unittest.main(warnings='ignore')
