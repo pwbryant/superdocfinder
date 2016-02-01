@@ -21,26 +21,28 @@ class HomePageTest(TestCase):
         expected_html = render_to_string('home.html')
         self.assertEqual(response.content.decode(),expected_html)
     
-    def test_home_page_can_return_solr_results_doc_titles(self):
+
+    def test_home_page_can_process_GET_requests(self):
         request = HttpRequest()
-        request.method = 'POST'
-        request.POST['search_term_text'] = 'atrazine Missouri'
+        request.method = 'GET'
+        search_terms = 'atrazine Missouri'
+        request.GET['search_term_text'] = search_terms
         
         response = home_page(request)
-        self.assertIn('atrazine', response.content.decode().lower())
-        self.assertIn('pecticide', response.content.decode().lower())
+
+        self.assertIn('atrazine',response.content.decode().lower())
+        self.assertIn('pecticide',response.content.decode().lower())
         
         solr = pysolr.Solr('http://localhost:8983/solr/testcore')
-        results = solr.search('atrazine Missouri').__dict__['docs']
+        results = solr.search(search_terms).__dict__['docs']
         expected_html = render_to_string('home.html',
                 {'search_results':results}
                 )
-        self.assertEqual(expected_html, response.content.decode())
-        #mulitple results
-    
-        #self.assertEqual(response.content.decode(),expected_html)
+        self.assertEqual(expected_html,response.content.decode())
 
+        
 
+        
 
 
 

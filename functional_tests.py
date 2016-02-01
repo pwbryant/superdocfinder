@@ -26,7 +26,7 @@ class NewVisitorTest(unittest.TestCase):
         self.browser.get('http://localhost:8000')
         self.browser.implicitly_wait(3)
         #She notice the tile 'Document Finder' and a
-        #a search bar
+        #a search bar:
         self.assertIn('Waterborne-env Docfinder',self.browser.title)
         header_text = self.browser.find_element_by_tag_name('h1').text
         self.assertIn('Document Search Tool',header_text)
