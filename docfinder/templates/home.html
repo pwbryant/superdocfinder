@@ -10,7 +10,11 @@
 		</form>
 
 		<table id="id_results_table">
-			<tr><td>{{ search_term_text }} result<td></tr>
+			{% for result in search_results %}
+				{% for title in result.title %}
+					<tr><td>{{ title }}</td></tr>
+				{% endfor %}
+			{% endfor %}
 		</table>
 	</body>
 </html>

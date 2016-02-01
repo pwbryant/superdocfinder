@@ -44,17 +44,25 @@ class NewVisitorTest(unittest.TestCase):
         inputbox.send_keys(Keys.ENTER)
         self.check_for_row_in_results_table('Big Time Atrazine Study')
 
-        self.fail('Finish the test')
         #Page Title and search bar are still there. User wants to search
-        #for all papers regarding Iowa, because Waterborne carries out 
-        #a lot of research there. They enter 'Iowa' and hit enter
+        #for all papers regarding Missouri, because Waterborne carries out 
+        #a lot of research there. They enter 'Missouri' and hit enter
         inputbox = self.browser.find_element_by_id('id_search_term')
-        inputbox.send_keys('Iowa')
+        inputbox.send_keys('Missouri')
         inputbox.send_keys(Keys.ENTER) 
 
         #The page updates again with the new results
-        self.check_for_row_in_results_table('Iowa result')
+        self.check_for_row_in_results_table('Pecticide Study')
 
+        #The User would like all papers mentioning atrazine and/or missouri
+        inputbox = self.browser.find_element_by_id('id_search_term')
+        inputbox.send_keys('atrazine Missouri')
+        inputbox.send_keys(Keys.ENTER) 
+
+        self.check_for_row_in_results_table('Big Time Atrazine Study')
+        self.check_for_row_in_results_table('Pecticide Study')
+
+        self.fail('Finish the test')
         #The User sees a document they are interested in and so they
         #click on a result, whereupon the document is downloaded to their
         #local computer
