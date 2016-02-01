@@ -12,7 +12,7 @@
 		<table id="id_results_table">
 			{% for result in search_results %}
 				{% for title in result.title %}
-					<tr><td>{{ title }}</td></tr>
+				<tr><td><a href="http://localhost:8983/solr/testcore/select?q=id:{{ result.id }}">{{ title }}</a></td></tr>
 				{% endfor %}
 			{% endfor %}
 		</table>
