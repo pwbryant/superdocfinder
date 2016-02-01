@@ -42,7 +42,7 @@ class NewVisitorTest(unittest.TestCase):
 
         #User hits ENTER and  the page is updated with the returned results. 
         inputbox.send_keys(Keys.ENTER)
-        self.check_for_row_in_results_table('atrazine result')
+        self.check_for_row_in_results_table('Big Time Atrazine Study')
 
         self.fail('Finish the test')
         #Page Title and search bar are still there. User wants to search
