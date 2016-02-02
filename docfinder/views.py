@@ -1,9 +1,20 @@
-from django.shortcuts import render
+from django.shortcuts import redirect, render
 from django.http import HttpResponse
 import pysolr
+from docfinder.models import Search
 
 # Create your views here.
+
 def home_page(request):
+    
+    if request.method == 'POST':
+        Search.objects.create(search_terms = request.POST['search_term_text'])
+        return redirect('/')
+
+    return render(request, 'home.html')
+
+
+def undefined(request):
 
     if request.GET.get('search_term_text') != None and len(request.GET['search_term_text'].split()) > 0:
         search_terms = request.GET['search_term_text']

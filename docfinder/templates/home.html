@@ -10,15 +10,7 @@
 		</form>
 
 		<table id="id_results_table">
-			{% for result in search_results %}
-				{% for title in result.title %}
-					{% if title == 'No Documents Found' %}
-						<tr><td>No Documents Found</tr></td>
-					{% else %}
-						<tr><td><a href="http://localhost:8983/solr/testcore/select?q=id:{{ result.id }}">{{ title }}</a></td></tr>
-					{% endif %}
-				{% endfor %}
-			{% endfor %}
+			<tr><td>{{ search_results }}</tr></td>
 		</table>
 	</body>
 </html>
