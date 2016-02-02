@@ -1,9 +1,9 @@
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
-import unittest
+from django.test import LiveServerTestCase
 
 
-class NewVisitorTest(unittest.TestCase):
+class NewVisitorTest(LiveServerTestCase):
 
     def setUp(self):
         self.browser = webdriver.Firefox()
@@ -23,7 +23,7 @@ class NewVisitorTest(unittest.TestCase):
         #User wants to find all documents that Waterborne has
         #concernging a variety of topics. They got to the homepage
         #of Waterborne's docfinder site
-        self.browser.get('http://localhost:8000')
+        self.browser.get(self.live_server_url)
         self.browser.implicitly_wait(3)
         #She notice the tile 'Document Finder' and a
         #a search bar:
@@ -83,5 +83,3 @@ class NewVisitorTest(unittest.TestCase):
         #local computer
 
 
-if __name__ == '__main__':
-    unittest.main(warnings='ignore')
