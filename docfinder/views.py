@@ -4,7 +4,7 @@ import pysolr
 
 # Create your views here.
 def home_page(request):
-    if len(request.GET) > 0:
+    if len(request.GET['search_term_text']) > 0:
         search_terms = request.GET['search_term_text']
         solr = pysolr.Solr('http://localhost:8983/solr/testcore',timeout=10)
         results = solr.search(search_terms).__dict__['docs']
@@ -13,5 +13,10 @@ def home_page(request):
             return render(request,'home.html',
                     {'search_results':results}
                     )
+        else:
+            return render(request,'home.html',
+                    {'search_results':[{'title':['No Documents Found']}]}
+                    )
+
     
     return render(request,'home.html')

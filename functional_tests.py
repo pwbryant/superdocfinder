@@ -62,6 +62,21 @@ class NewVisitorTest(unittest.TestCase):
         self.check_for_row_in_results_table('Big Time Atrazine Study')
         self.check_for_row_in_results_table('Pecticide Study')
 
+        #User accidentilly hits 'Enter' and searches with no search terms
+        #and nothing happens
+
+        inputbox = self.browser.find_element_by_id('id_search_term')
+        inputbox.send_keys('')
+        inputbox.send_keys(Keys.ENTER) 
+
+        #User enters Nebraska, but there aren't any papers pertaining
+        #to Nebraska, so a result of 'No Results' is returned
+    
+        inputbox = self.browser.find_element_by_id('id_search_term')
+        inputbox.send_keys('Nebraska')
+        inputbox.send_keys(Keys.ENTER) 
+        
+        self.check_for_row_in_results_table('No Documents Found')
         self.fail('Finish the test')
         #The User sees a document they are interested in and so they
         #click on a result, whereupon the document is downloaded to their
