@@ -24,6 +24,7 @@ class NewVisitorTest(LiveServerTestCase):
         #concernging a variety of topics. They got to the homepage
         #of Waterborne's docfinder site
         self.browser.get(self.live_server_url)
+        
         self.browser.implicitly_wait(3)
         #She notice the tile 'Document Finder' and a
         #a search bar:
@@ -42,6 +43,7 @@ class NewVisitorTest(LiveServerTestCase):
 
         #User hits ENTER and  the page is updated with the returned results. 
         inputbox.send_keys(Keys.ENTER)
+        self.assertRegex(self.browser.current_url,'/search/')
         self.check_for_row_in_results_table('Big Time Atrazine Study')
 
         self.fail('Finish the test')

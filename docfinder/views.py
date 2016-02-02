@@ -6,7 +6,6 @@ from docfinder.models import Search
 # Create your views here.
 
 def home_page(request):
-    
     if request.method == 'POST':
         Search.objects.create(search_terms = request.POST['search_term_text'])
         return redirect('/')
@@ -14,6 +13,24 @@ def home_page(request):
     return render(request, 'home.html')
 
 
+def search(request):
+    if len(request.POST['search_term_text'].split()) > 0:
+        search_terms = request.POST['search_term_text'].lower().split()
+        search_terms.sort()
+        search_terms = '_'.join(search_terms)
+        Search.objects.create(search_terms = search_terms)
+        return redirect('/search/%s/' % search_terms)
+    else:
+        return redirect('/')
+        
+
+def get_search_results(request):
+
+    return render(request,'home.html',
+            {'search_results':'Big Time Atrazine Study'}
+                    )
+
+    
 def undefined(request):
 
     if request.GET.get('search_term_text') != None and len(request.GET['search_term_text'].split()) > 0:
