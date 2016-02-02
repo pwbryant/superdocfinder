@@ -22,23 +22,14 @@ class HomePageTest(TestCase):
         self.assertEqual(response.content.decode(),expected_html)
     
 
-    def test_home_page_can_process_GET_requests(self):
+    def test_home_page_can_save__POST_requests_and_get_results(self):
         request = HttpRequest()
-        request.method = 'GET'
+        request.method = 'POST'
         search_terms = 'atrazine Missouri'
         request.GET['search_term_text'] = search_terms
         
         response = home_page(request)
 
-        self.assertIn('atrazine',response.content.decode().lower())
-        self.assertIn('pecticide',response.content.decode().lower())
-        
-        solr = pysolr.Solr('http://localhost:8983/solr/testcore')
-        results = solr.search(search_terms).__dict__['docs']
-        expected_html = render_to_string('home.html',
-                {'search_results':results}
-                )
-        self.assertEqual(expected_html,response.content.decode())
 
         
 
