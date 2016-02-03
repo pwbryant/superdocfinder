@@ -46,7 +46,7 @@ class HomePageTest(TestCase):
         request.method = 'POST'
         request.POST['search_term_text'] = 'atrazine missouri'
         
-        response = home_page(request)
+        response = search(request)
 
         self.assertEqual(Search.objects.count(),1)
         newly_saved_search = Search.objects.first()
