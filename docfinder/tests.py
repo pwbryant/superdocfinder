@@ -95,6 +95,11 @@ class SeachesModelTest(TestCase):
         self.assertEqual(second_saved_search.search_terms, 'missouri')
 
 
+class SearchResultsTests(TestCase):
+
+    def test_uses_search_template(self):
+        response = self.client.get("/search/atrazine_missouri/")
+        self.assertTemplateUsed(response, 'search.html')
         
 
         

@@ -24,10 +24,13 @@ def search(request):
         return redirect('/')
         
 
-def get_search_results(request):
+def get_search_results(request,search_terms):
 
-    return render(request,'home.html',
-            {'search_results':'Big Time Atrazine Study'}
+    search_terms = ' '.join(search_terms.split('_'))
+    solr = pysolr.Solr('http://localhost:8983/solr/testcore',timeout=10)
+    results = solr.search(search_terms).__dict__['docs']
+    return render(request,'search.html',
+            {'search_results':results}
                     )
 
     

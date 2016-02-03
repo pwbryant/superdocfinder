@@ -20,7 +20,7 @@ from docfinder import views
 urlpatterns = [
     url(r'^$', views.home_page, name='home'),
     url(r'^search/$', views.search, name='search'),
-    url(r'^search/.+/$',views.get_search_results, name='get_search_results'),
+    url(r'^search/(.+)/$',views.get_search_results, name='get_search_results'),
     #url(r'^admin/', include(admin.site.urls)),
 
 ]

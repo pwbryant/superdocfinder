@@ -8,5 +8,15 @@
 			<input name="search_term_text" id="id_search_term" placeholder="Enter search term(s)" />
 			{% csrf_token %}
 		</form>
+
+		<table id="id_results_table">
+			{% for result in search_results %}
+				{% for title in result.title %}
+			        	<tr><td>{{ title }}</tr></td>
+				{% endfor %}
+			{% empty %}
+				<tr><td>No Documents Found</td></tr>
+			{% endfor %}
+		</table>
 	</body>
 </html>
