@@ -4,7 +4,7 @@
 	</head>
 	<body>
 		<h1>Document Search Tool</h1>
-		<form action="/search/" method="POST" >
+		<form action="/search/new_search" method="POST" >
 			<input name="search_term_text" id="id_search_term" placeholder="Enter search term(s)" />
 			{% csrf_token %}
 		</form>

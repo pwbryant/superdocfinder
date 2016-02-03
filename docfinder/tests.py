@@ -21,8 +21,7 @@ class HomePageTest(TestCase):
         response = home_page(request)
         expected_html = render_to_string('home.html')
         self.assertEqual(response.content.decode(),expected_html)
-    
-   
+      
 
 class SeachesModelTest(TestCase):
     
@@ -51,17 +50,13 @@ class SearchResultsTests(TestCase):
         self.assertTemplateUsed(response, 'search.html')
 
 
+
 class SearchTests(TestCase):
      
     def test_search_url_resolves_to_search_view(self):
-        found = resolve('/search/')
+        found = resolve('/search/new_search')
         self.assertEqual(found.func, search)
  
-
-    def test_get_search_url_resolves_to_get_search_results_view(self):
-        found = resolve('/search/atrazine_missouri/')
-        self.assertEqual(found.func, get_search_results)
-   
 
     def test_search_only_saves_items_when_necessary(self):
         request = HttpRequest()
@@ -104,8 +99,12 @@ class SearchTests(TestCase):
         self.assertEqual(response['location'],'/')
 
 
-        
+    def test_get_search_url_resolves_to_get_search_results_view(self):
 
+        found = resolve('/search/atrazine_missouri/')
+        self.assertEqual(found.func, get_search_results)
+        
+     
 
 
 

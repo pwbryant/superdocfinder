@@ -15,11 +15,12 @@ Including another URLconf
 """
 from django.conf.urls import include, url
 #from django.contrib import admin
-from docfinder import views as search_views
-from docfinder import urls as search_urls
+from docfinder import views
+
 urlpatterns = [
-    url(r'^$', search_views.home_page, name='home'),
-    url(r'^search/', include(search_urls)),
+    url(r'^$', views.home_page, name='home'),
+    url(r'^new_search', views.search, name='search'),
+    url(r'^(.+)/$',views.get_search_results, name='get_search_results'),
     #url(r'^admin/', include(admin.site.urls)),
 
 ]
