@@ -4,7 +4,7 @@ from django.http import HttpRequest
 from django.template.loader import render_to_string
 import pysolr
 
-from docfinder.views import home_page, search, get_search_results
+from docfinder.views import home_page, search, get_search_results, download
 from docfinder.models import Search
 
 # Create your tests here.
@@ -46,10 +46,14 @@ class SeachesModelTest(TestCase):
 class SearchResultsTests(TestCase):
     
     def test_uses_search_template(self):
-        response = self.client.get("/search/atrazine_missouri/")
+        response = self.client.get("/search/get_search_results/atrazine_missouri/")
         self.assertTemplateUsed(response, 'search.html')
 
+    def test_get_search_url_resolves_to_get_search_results_view(self):
 
+        found = resolve('/search/get_search_results/atrazine_missouri/')
+        self.assertEqual(found.func, get_search_results)
+ 
 
 class SearchTests(TestCase):
      
@@ -88,7 +92,7 @@ class SearchTests(TestCase):
         search_terms_url ='atrazine_missouri'
         response = search(request)
         self.assertEqual(response.status_code, 302)
-        self.assertEqual(response['location'],'/search/%s/' % search_terms_url)
+        self.assertEqual(response['location'],'/search/get_search_results/%s/' % search_terms_url)
 
         request = HttpRequest()
         request.method = 'POST'
@@ -99,14 +103,24 @@ class SearchTests(TestCase):
         self.assertEqual(response['location'],'/')
 
 
-    def test_get_search_url_resolves_to_get_search_results_view(self):
 
-        found = resolve('/search/atrazine_missouri/')
-        self.assertEqual(found.func, get_search_results)
+
+class DownloadResultsTest(TestCase):      
+
+
+    def test_download_url_resolves_to_download_view(self):
+
+        found = resolve('/search/download/1/')
+        self.assertEqual(found.func, download)
+
+    def test_can_locate_downloaded_doc_from_download_view(self):
         
-     
+        response = download(HttpRequest,'1')
+        print(response)
+        print(response['Content-Disposition'])
+        self.assertEqual(response['Content-Disposition'], 'attachment; filename="test.csv"')
 
-
+        
 
 
 

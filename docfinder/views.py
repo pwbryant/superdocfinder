@@ -16,7 +16,7 @@ def search(request):
         search_terms_url = '_'.join(search_terms)
         search_terms_str = ' '.join(search_terms)
         Search.objects.create(search_terms = search_terms_str)
-        return redirect('/search/%s/' % search_terms_url)
+        return redirect('/search/get_search_results/%s/' % search_terms_url)
     else:
         return redirect('/')
         
@@ -30,4 +30,7 @@ def get_search_results(request,search_terms):
             {'search_results':results}
                     )
 
-    
+def download(request,doc_id):
+    response = HttpResponse()
+    response['Content-Disposition'] = 'attachment; filename="test.csv"'
+    return response
