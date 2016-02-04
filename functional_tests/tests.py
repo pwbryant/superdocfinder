@@ -24,7 +24,6 @@ class NewVisitorTest(LiveServerTestCase):
         #concernging a variety of topics. They got to the homepage
         #of Waterborne's docfinder site
         self.browser.get(self.live_server_url)
-        
         self.browser.implicitly_wait(3)
         #She notice the tile 'Document Finder' and a
         #a search bar:
@@ -37,8 +36,25 @@ class NewVisitorTest(LiveServerTestCase):
                 'Enter search term(s)'
                 )
 
+        #User accidentilly hits 'Enter' and searches with no search terms
+        #and nothing happens
+
+        inputbox = self.browser.find_element_by_id('id_search_term')
+        inputbox.send_keys('')
+        inputbox.send_keys(Keys.ENTER) 
+
+        #User enters Nebraska, but there aren't any papers pertaining
+        #to Nebraska, so a result of 'No Results' is returned
+    
+        inputbox = self.browser.find_element_by_id('id_search_term')
+        inputbox.send_keys('Nebraska')
+        inputbox.send_keys(Keys.ENTER) 
+        
+        self.check_for_row_in_results_table('No Documents Found')
+ 
         #she types in 'atrazine' and hits enter to get all docs regarding 
         #atrazine.
+        inputbox = self.browser.find_element_by_id('id_search_term')
         inputbox.send_keys('atrazine')
 
         #User hits ENTER and  the page is updated with the returned results. 
@@ -46,7 +62,6 @@ class NewVisitorTest(LiveServerTestCase):
         self.assertRegex(self.browser.current_url,'/search/')
         self.check_for_row_in_results_table('Big Time Atrazine Study')
 
-        self.fail('Finish the test')
         #Page Title and search bar are still there. User wants to search
         #for all papers regarding Missouri, because Waterborne carries out 
         #a lot of research there. They enter 'Missouri' and hit enter
@@ -65,23 +80,11 @@ class NewVisitorTest(LiveServerTestCase):
         self.check_for_row_in_results_table('Big Time Atrazine Study')
         self.check_for_row_in_results_table('Pecticide Study')
 
-        #User accidentilly hits 'Enter' and searches with no search terms
-        #and nothing happens
-
-        inputbox = self.browser.find_element_by_id('id_search_term')
-        inputbox.send_keys('')
-        inputbox.send_keys(Keys.ENTER) 
-
-        #User enters Nebraska, but there aren't any papers pertaining
-        #to Nebraska, so a result of 'No Results' is returned
-    
-        inputbox = self.browser.find_element_by_id('id_search_term')
-        inputbox.send_keys('Nebraska')
-        inputbox.send_keys(Keys.ENTER) 
-        
-        self.check_for_row_in_results_table('No Documents Found')
         #The User sees a document they are interested in and so they
         #click on a result, whereupon the document is downloaded to their
         #local computer
+        hyperlink = self.browser.find_element_by_id("search_result_1").click()
+        
+        downloaded_file = open('/home/paul/Downloads/test.csv','r')
 
-
+        self.fail('Finish the test')

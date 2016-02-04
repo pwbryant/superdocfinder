@@ -12,7 +12,7 @@
 		<table id="id_results_table">
 			{% for result in search_results %}
 				{% for title in result.title %}
-			        	<tr><td>{{ title }}</tr></td>
+				<tr><td><a id="search_result_{{ result.id }}" href='/search/get_doc/{{ result.id }}/'>{{ title}}</a></tr></td>
 				{% endfor %}
 			{% empty %}
 				<tr><td>No Documents Found</td></tr>
