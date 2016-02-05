@@ -1,9 +1,11 @@
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
-from django.test import LiveServerTestCase
+from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 from docfinder.models import Document
 import os
-class NewVisitorTest(LiveServerTestCase):
+
+
+class NewVisitorTest(StaticLiveServerTestCase):
 
     def setUp(self):
         Document.objects.create(doc_id='1', filename = 'test.csv', author = "Paul Bryant", abstract = "Here is the Atrazine abstract")
@@ -42,7 +44,7 @@ class NewVisitorTest(LiveServerTestCase):
 
 
         #After searching for a document the User sees that the search/results' page input box is also centered
-        inputbox.send_keys('Dummy doc')
+        inputbox.send_keys('atrazine missouri')
         inputbox.send_keys(Keys.ENTER)
 
         inputbox = self.browser.find_element_by_id('id_search_term')
@@ -51,7 +53,6 @@ class NewVisitorTest(LiveServerTestCase):
                 512,
                 delta=5
                 )
-
 
         self.fail('Finish the test')
 
