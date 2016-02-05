@@ -44,6 +44,7 @@ class ModelTest(TestCase):
         self.assertEqual(first_saved_search.search_terms, 'atrazine')
         self.assertEqual(second_saved_search.search_terms, 'missouri')
      
+
     def test_saving_and_retrieving_searches(self):
         search = Search(search_terms = 'atrazine')
         search.save()
@@ -53,6 +54,7 @@ class ModelTest(TestCase):
         saved_search = saved_searches[0]
         self.assertEqual(saved_searches.count(),1)
         self.assertEqual(saved_search.search_id.search_terms,search.search_terms)
+
 
     def test_saving_and_retrieving_documents(self):
         document = Document(doc_id = '1', filename='test.pdf', author="Slick Willy",abstract='here is an abstract')

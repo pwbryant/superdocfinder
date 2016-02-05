@@ -27,8 +27,36 @@ class NewVisitorTest(LiveServerTestCase):
         rows = table.find_elements_by_tag_name('tr')
         self.assertIn(row_text, [row.text for row in rows])
 
+    def test_layout_and_styling(self):
+        #User goes to homepage
+        self.browser.get(self.live_server_url)
+        self.browser.set_window_size(1024,768)
+        
+        #User notices the inputbox is nicely centered
+        inputbox = self.browser.find_element_by_id('id_search_term')
+        self.assertAlmostEqual(
+                inputbox.location['x'] + inputbox.size['width']/2,
+                512,
+                delta=5
+                )
 
-    def test_can_enter_search_term_and_retrieve_results(self):
+
+        #After searching for a document the User sees that the search/results' page input box is also centered
+        inputbox.send_keys('Dummy doc')
+        inputbox.send_keys(Keys.ENTER)
+
+        inputbox = self.browser.find_element_by_id('id_search_term')
+        self.assertAlmostEqual(
+                inputbox.location['x'] + inputbox.size['width']/2,
+                512,
+                delta=5
+                )
+
+
+        self.fail('Finish the test')
+
+    
+    def xtest_can_enter_search_term_and_retrieve_results(self):
         #User wants to find all documents that Waterborne has
         #concernging a variety of topics. They got to the homepage
         #of Waterborne's docfinder site
@@ -102,4 +130,3 @@ class NewVisitorTest(LiveServerTestCase):
         input()
         downloaded_file = open('/home/paul/Downloads/test.csv','r')
 
-        self.fail('Finish the test')

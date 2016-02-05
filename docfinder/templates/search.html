@@ -1,22 +1,13 @@
-<html>
-	<head>
-		<title>Waterborne-env Docfinder</title>
-	</head>
-	<body>
-		<h1>Document Search Tool</h1>
-		<form action="/search/new_search" method="POST" >
-			<input name="search_term_text" id="id_search_term" placeholder="Enter search term(s)" />
-			{% csrf_token %}
-		</form>
+{% extends 'base.html' %}
 
-		<table id="id_results_table">
-			{% for result in search_results %}
-				{% for title in result.title %}
-				<tr><td><a id="search_result_{{ result.id }}" href='/search/download/{{ result.id }}/'>{{title}}</a></tr></td>
-				{% endfor %}
-			{% empty %}
-				<tr><td>No Documents Found</td></tr>
-			{% endfor %}
-		</table>
-	</body>
-</html>
+{% block table %}
+<table id="id_results_table">
+{% for result in search_results %}
+	{% for title in result.title %}
+	<tr><td><a id="search_result_{{ result.id }}" href='/search/download/{{ result.id }}/'>{{title}}</a></tr></td>
+	{% endfor %}
+{% empty %}
+	<tr><td>No Documents Found</td></tr>
+{% endfor %}
+</table>
+{% endblock %}
