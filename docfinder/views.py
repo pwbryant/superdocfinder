@@ -1,7 +1,7 @@
 from django.shortcuts import redirect, render
 from django.http import HttpResponse
 import pysolr
-from docfinder.models import Search, Documents, Searches
+from docfinder.models import Search, Document, Searches, Result
 import os
 from datetime import datetime
 
@@ -32,12 +32,16 @@ def get_search_results(request,search_terms):
     search_terms = ' '.join(search_terms.split('_'))
     solr = pysolr.Solr('http://localhost:8983/solr/testcore',timeout=10)
     results = solr.search(search_terms).__dict__['docs']
+    searches = Searches.objects.last()
+    for solr_result in results:
+        document = Document.objects.get(doc_id = solr_result['id'])
+        Result.objects.create(doc_id = document, searches_id = searches)
     return render(request,'search.html',
             {'search_results':results}
                     )
 
 def download(request,doc_id):
-    document = Documents.objects.get(doc_id = doc_id)
+    document = Document.objects.get(doc_id = doc_id)
     file_name = document.filename
     
     os.chdir('/home/paul/MyCode/Django/test_docs')

@@ -7,7 +7,7 @@ import os
 from datetime import datetime
 
 from docfinder.views import home_page, search, get_search_results, download
-from docfinder.models import Search, Documents, Searches
+from docfinder.models import Search, Document, Searches, Result
 
 # Create your tests here.
 
@@ -27,7 +27,7 @@ class HomePageTest(TestCase):
 
 class SeachesModelTest(TestCase):
     
-    def test_saving_and_retrieving_searches(self):
+    def test_saving_and_retrieving_search(self):
         first_search = Search()
         first_search.search_terms = 'atrazine'
         first_search.save()
@@ -43,19 +43,63 @@ class SeachesModelTest(TestCase):
         second_saved_search = saved_searches[1]
         self.assertEqual(first_saved_search.search_terms, 'atrazine')
         self.assertEqual(second_saved_search.search_terms, 'missouri')
-
+        
+        #cleanup
+        Search.objects.all().delete()
 
 class SearchResultsTests(TestCase):
     
     def test_uses_search_template(self):
+        search = Search(search_terms = 'atrazine missouri')
+        search.save()
+        searches = Searches(search_id = search,time=datetime.now())
+        searches.save()
+        document1 = Document(doc_id = '1', filename = 'test.csv', author="Paul Bryant", abstract = "Here is the atrazine abstract")
+        document2 = Document(doc_id = '2', filename = 'test2.csv', author="Gill Humphry", abstract = "We studied stuff")
+
+        document1.save()
+        document2.save()
+
         response = self.client.get("/search/get_search_results/atrazine_missouri/")
         self.assertTemplateUsed(response, 'search.html')
+
 
     def test_get_search_url_resolves_to_get_search_results_view(self):
 
         found = resolve('/search/get_search_results/atrazine_missouri/')
         self.assertEqual(found.func, get_search_results)
- 
+
+    def test_get_search_results_creates_results_objects(self):
+
+        request = HttpRequest()
+        search = Search(search_terms = 'atrazine missouri')
+        search.save()
+        searches = Searches(search_id = search,time=datetime.now())
+        searches.save()
+        document1 = Document(doc_id = '1', filename = 'test.csv', author="Paul Bryant", abstract = "Here is the atrazine abstract")
+        document2 = Document(doc_id = '2', filename = 'test2.csv', author="Gill Humphry", abstract = "We studied stuff")
+
+        document1.save()
+        document2.save()
+
+        get_search_results(request,'atrazine_missouri')
+
+        newly_saved_results = Result.objects.all()
+        result1 = newly_saved_results[0]
+        result2 = newly_saved_results[1]
+
+        self.assertEqual(Result.objects.count(),2)
+        self.assertEqual(result1.searches_id, searches)
+        self.assertEqual(result2.searches_id, searches)
+        self.assertEqual(result1.doc_id,document1)
+        self.assertEqual(result2.doc_id,document2)
+        
+        #cleanup
+        Search.objects.all().delete()
+        Searches.objects.all().delete()
+        Document.objects.all().delete()
+    
+
 
 class SearchTests(TestCase):
      
@@ -76,7 +120,9 @@ class SearchTests(TestCase):
         request.POST['search_term_text'] = 'atrazine missouri'
         search(request)
         self.assertEqual(Search.objects.count(),1)
-
+        
+        #cleanup
+        Search.objects.all().delete()
 
 
     def test_search_can_save_POST_and_create_Search_and_Searches_objects(self):
@@ -93,6 +139,8 @@ class SearchTests(TestCase):
         self.assertEqual(newly_saved_search.search_terms, 'atrazine missouri')
         self.assertEqual(newly_saved_searches.search_id.pk,newly_saved_search.pk)
         self.assertEqual(type(datetime.now()),type(newly_saved_searches.time))
+        #cleanup 
+        Search.objects.all().delete()
 
 
     def test_search_redirects_correctly_after_POST(self):
@@ -120,21 +168,21 @@ class SearchTests(TestCase):
 
 class DownloadResultsTest(TestCase):      
 
-
     def test_download_url_resolves_to_download_view(self):
-
         found = resolve('/search/download/1/')
         self.assertEqual(found.func, download)
 
     def test_download_view_locates_for_download_the_desired_document(self):
         
-        document = Documents.objects.create(doc_id = '1', filename = 'UT_test.csv')
+        document = Document.objects.create(doc_id = '1', filename = 'UT_test.csv')
         response = download(HttpRequest,'1')
         self.assertEqual(response['Content-Disposition'], 'attachment; filename="UT_test.csv"')
         os.chdir('/home/paul/MyCode/Django/test_docs') 
         doc = open('UT_test.csv','r').read()
         self.assertEqual(response.content.decode(),doc)
-     
+        
+        #cleanup
+        Document.objects.all().delete()
 
 
 
