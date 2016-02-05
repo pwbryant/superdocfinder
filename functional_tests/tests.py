@@ -1,12 +1,14 @@
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from django.test import LiveServerTestCase
-from docfinder.models import Documents
+from docfinder.models import Document
 import os
 class NewVisitorTest(LiveServerTestCase):
 
     def setUp(self):
-        Documents.objects.create(doc_id='1689ca84-3300-46b8-a706-3f847c909a42', filename = 'test.csv', author = "Paul Bryant", abstract = "Here is the Atrazine abstract")
+        Document.objects.create(doc_id='1', filename = 'test.csv', author = "Paul Bryant", abstract = "Here is the Atrazine abstract")
+        Document.objects.create(doc_id='2', filename = 'test2.csv', author = "Gary Smith", abstract = "We did a pesticide study in Missouri")
+        
         profile = webdriver.FirefoxProfile()
         profile.set_preference('browser.download.manager.showWhenStarting',False)
         #profile.set_preference('browser.helperApps.neverAsk.saveToDisk','text/csv')
@@ -66,7 +68,7 @@ class NewVisitorTest(LiveServerTestCase):
 
         #User hits ENTER and  the page is updated with the returned results. 
         inputbox.send_keys(Keys.ENTER)
-        self.assertRegex(self.browser.current_url,'/search/')
+        self.assertRegex(self.browser.current_url,'/search/display_results/')
         self.check_for_row_in_results_table('Big Time Atrazine Study')
 
         #Page Title and search bar are still there. User wants to search
@@ -90,7 +92,7 @@ class NewVisitorTest(LiveServerTestCase):
         #The User sees a document they are interested in and so they
         #click on a result, whereupon the document is downloaded to their
         #local computer
-        doc = Documents.objects.first()
+        doc = Document.objects.first()
         os.chdir('/home/paul/Downloads')
         try:
             os.remove('test.csv')

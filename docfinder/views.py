@@ -22,23 +22,30 @@ def search(request):
         search = Search.objects.get(search_terms = search_terms_str)
         Searches.objects.create(search_id = search)
             
-        return redirect('/search/get_search_results/%s/' % search_terms_url)
+        return redirect('/search/get_search_results/%s' % search_terms_url)
     else:
         return redirect('/')
         
 
 def get_search_results(request,search_terms):
-
-    search_terms = ' '.join(search_terms.split('_'))
+    search_terms_for_solr = ' '.join(search_terms.split('_'))
     solr = pysolr.Solr('http://localhost:8983/solr/testcore',timeout=10)
-    results = solr.search(search_terms).__dict__['docs']
+    results = solr.search(search_terms_for_solr).__dict__['docs']
     searches = Searches.objects.last()
     for solr_result in results:
         document = Document.objects.get(doc_id = solr_result['id'])
         Result.objects.create(doc_id = document, searches_id = searches)
+    return redirect('/search/display_results/%s/' % search_terms)
+
+
+def display_results(request, search_terms):
+    search_terms_for_solr = ' '.join(search_terms.split('_'))
+    solr = pysolr.Solr('http://localhost:8983/solr/testcore',timeout=10)
+    results = solr.search(search_terms_for_solr).__dict__['docs']
     return render(request,'search.html',
             {'search_results':results}
                     )
+
 
 def download(request,doc_id):
     document = Document.objects.get(doc_id = doc_id)
@@ -47,6 +54,5 @@ def download(request,doc_id):
     os.chdir('/home/paul/MyCode/Django/test_docs')
     content = open('%s' % file_name,'r')
     response = HttpResponse(content,content_type = 'application/csv')
-    response['Content-Disposition'] = 'attachment; filename="%s"' % file_name
-    
+    response['Content-Disposition'] = 'attachment; filename="%s"' % file_name 
     return response

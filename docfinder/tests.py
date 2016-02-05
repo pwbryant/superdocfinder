@@ -44,23 +44,11 @@ class SeachesModelTest(TestCase):
         self.assertEqual(first_saved_search.search_terms, 'atrazine')
         self.assertEqual(second_saved_search.search_terms, 'missouri')
         
-        #cleanup
-        Search.objects.all().delete()
 
 class SearchResultsTests(TestCase):
     
     def test_uses_search_template(self):
-        search = Search(search_terms = 'atrazine missouri')
-        search.save()
-        searches = Searches(search_id = search,time=datetime.now())
-        searches.save()
-        document1 = Document(doc_id = '1', filename = 'test.csv', author="Paul Bryant", abstract = "Here is the atrazine abstract")
-        document2 = Document(doc_id = '2', filename = 'test2.csv', author="Gill Humphry", abstract = "We studied stuff")
-
-        document1.save()
-        document2.save()
-
-        response = self.client.get("/search/get_search_results/atrazine_missouri/")
+        response = self.client.get("/search/display_results/atrazine_missouri/")
         self.assertTemplateUsed(response, 'search.html')
 
 
@@ -83,7 +71,7 @@ class SearchResultsTests(TestCase):
         document2.save()
 
         get_search_results(request,'atrazine_missouri')
-
+    
         newly_saved_results = Result.objects.all()
         result1 = newly_saved_results[0]
         result2 = newly_saved_results[1]
@@ -94,11 +82,26 @@ class SearchResultsTests(TestCase):
         self.assertEqual(result1.doc_id,document1)
         self.assertEqual(result2.doc_id,document2)
         
-        #cleanup
-        Search.objects.all().delete()
-        Searches.objects.all().delete()
-        Document.objects.all().delete()
-    
+ 
+    def test_get_search_veiw_redirects_correctly_after_being_called(self):
+        request = HttpRequest()
+        search = Search(search_terms = 'atrazine missouri')
+        search.save()
+        searches = Searches(search_id = search,time=datetime.now())
+        searches.save()
+        document1 = Document(doc_id = '1', filename = 'test.csv', author="Paul Bryant", abstract = "Here is the atrazine abstract")
+        document2 = Document(doc_id = '2', filename = 'test2.csv', author="Gill Humphry", abstract = "We studied stuff")
+
+        document1.save()
+        document2.save()
+
+        search_terms_url = 'atrazine_missouri'
+        response = get_search_results(request,search_terms_url)
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response['location'],'/search/display_results/%s/' % search_terms_url)
+
+
+   
 
 
 class SearchTests(TestCase):
@@ -121,8 +124,6 @@ class SearchTests(TestCase):
         search(request)
         self.assertEqual(Search.objects.count(),1)
         
-        #cleanup
-        Search.objects.all().delete()
 
 
     def test_search_can_save_POST_and_create_Search_and_Searches_objects(self):
@@ -139,8 +140,6 @@ class SearchTests(TestCase):
         self.assertEqual(newly_saved_search.search_terms, 'atrazine missouri')
         self.assertEqual(newly_saved_searches.search_id.pk,newly_saved_search.pk)
         self.assertEqual(type(datetime.now()),type(newly_saved_searches.time))
-        #cleanup 
-        Search.objects.all().delete()
 
 
     def test_search_redirects_correctly_after_POST(self):
@@ -153,7 +152,7 @@ class SearchTests(TestCase):
         search_terms_url ='atrazine_missouri'
         response = search(request)
         self.assertEqual(response.status_code, 302)
-        self.assertEqual(response['location'],'/search/get_search_results/%s/' % search_terms_url)
+        self.assertEqual(response['location'],'/search/get_search_results/%s' % search_terms_url)
 
         request = HttpRequest()
         request.method = 'POST'
@@ -181,8 +180,6 @@ class DownloadResultsTest(TestCase):
         doc = open('UT_test.csv','r').read()
         self.assertEqual(response.content.decode(),doc)
         
-        #cleanup
-        Document.objects.all().delete()
 
 
 
