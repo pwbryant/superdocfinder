@@ -1,8 +1,9 @@
 from django.shortcuts import redirect, render
 from django.http import HttpResponse
 import pysolr
-from docfinder.models import Search, Documents
+from docfinder.models import Search, Documents, Searches
 import os
+from datetime import datetime
 
 # Create your views here.
 
@@ -16,7 +17,11 @@ def search(request):
         search_terms.sort()
         search_terms_url = '_'.join(search_terms)
         search_terms_str = ' '.join(search_terms)
-        Search.objects.create(search_terms = search_terms_str)
+        if len(Search.objects.filter(search_terms = search_terms_str)) == 0:
+            Search.objects.create(search_terms = search_terms_str)
+        search = Search.objects.get(search_terms = search_terms_str)
+        Searches.objects.create(search_id = search)
+            
         return redirect('/search/get_search_results/%s/' % search_terms_url)
     else:
         return redirect('/')

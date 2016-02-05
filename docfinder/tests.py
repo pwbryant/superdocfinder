@@ -4,9 +4,10 @@ from django.http import HttpRequest
 from django.template.loader import render_to_string
 import pysolr
 import os
+from datetime import datetime
 
 from docfinder.views import home_page, search, get_search_results, download
-from docfinder.models import Search, Documents
+from docfinder.models import Search, Documents, Searches
 
 # Create your tests here.
 
@@ -63,15 +64,22 @@ class SearchTests(TestCase):
         self.assertEqual(found.func, search)
  
 
-    def test_search_only_saves_items_when_necessary(self):
+    def test_search_does_not_save_search_and_searches_objects_if_unneccesary(self):
         request = HttpRequest()
         request.method = 'POST'
         request.POST['search_term_text'] = ''
         search(request)
         self.assertEqual(Search.objects.count(), 0)
-        
+        self.assertEqual(Searches.objects.count(),0)
 
-    def test_search_can_save_POST_requests(self):
+        Search.objects.create(search_terms = 'atrazine missouri')
+        request.POST['search_term_text'] = 'atrazine missouri'
+        search(request)
+        self.assertEqual(Search.objects.count(),1)
+
+
+
+    def test_search_can_save_POST_and_create_Search_and_Searches_objects(self):
         request = HttpRequest()
         request.method = 'POST'
         request.POST['search_term_text'] = 'atrazine missouri'
@@ -79,9 +87,13 @@ class SearchTests(TestCase):
         response = search(request)
 
         self.assertEqual(Search.objects.count(),1)
+        self.assertEqual(Searches.objects.count(),1)
         newly_saved_search = Search.objects.first()
+        newly_saved_searches = Searches.objects.first()
         self.assertEqual(newly_saved_search.search_terms, 'atrazine missouri')
-   
+        self.assertEqual(newly_saved_searches.search_id.pk,newly_saved_search.pk)
+        self.assertEqual(type(datetime.now()),type(newly_saved_searches.time))
+
 
     def test_search_redirects_correctly_after_POST(self):
         request = HttpRequest()

@@ -3,7 +3,13 @@ from django.db import models
 # Create your models here.
 
 class Search(models.Model):
-    search_terms = models.TextField(default='')
+    search_terms = models.TextField(default='',unique=True)
+
+
+class Searches(models.Model):
+    search_id = models.ForeignKey(Search, on_delete=models.CASCADE)
+    time = models.DateTimeField(auto_now = True)
+
 
 class Documents(models.Model):
     

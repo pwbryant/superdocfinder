@@ -92,7 +92,10 @@ class NewVisitorTest(LiveServerTestCase):
         #local computer
         doc = Documents.objects.first()
         os.chdir('/home/paul/Downloads')
-        os.remove('test.csv')
+        try:
+            os.remove('test.csv')
+        except:
+            pass
         self.browser.find_element_by_id("search_result_%s" % doc.doc_id).click()
         input()
         downloaded_file = open('/home/paul/Downloads/test.csv','r')
