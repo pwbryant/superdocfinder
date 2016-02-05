@@ -3,6 +3,7 @@ from django.core.urlresolvers import resolve
 from django.http import HttpRequest
 from django.template.loader import render_to_string
 import pysolr
+import os
 
 from docfinder.views import home_page, search, get_search_results, download
 from docfinder.models import Search, Documents
@@ -113,13 +114,15 @@ class DownloadResultsTest(TestCase):
         found = resolve('/search/download/1/')
         self.assertEqual(found.func, download)
 
-    def test_can_locate_downloaded_doc_from_download_view(self):
+    def test_download_view_locates_for_download_the_desired_document(self):
         
-        document = Documents.objects.create(doc_id = '1', filename = 'test.csv', author = "Paul Braynt", abstract="blah blah blah blah blah")
+        document = Documents.objects.create(doc_id = '1', filename = 'UT_test.csv')
         response = download(HttpRequest,'1')
-        self.assertEqual(response['Content-Disposition'], 'attachment; filename="test.csv"')
-
-        
+        self.assertEqual(response['Content-Disposition'], 'attachment; filename="UT_test.csv"')
+        os.chdir('/home/paul/MyCode/Django/test_docs') 
+        doc = open('UT_test.csv','r').read()
+        self.assertEqual(response.content.decode(),doc)
+     
 
 
 
