@@ -5,7 +5,7 @@ from django.template.loader import render_to_string
 import pysolr
 
 from docfinder.views import home_page, search, get_search_results, download
-from docfinder.models import Search
+from docfinder.models import Search, Documents
 
 # Create your tests here.
 
@@ -115,9 +115,8 @@ class DownloadResultsTest(TestCase):
 
     def test_can_locate_downloaded_doc_from_download_view(self):
         
+        document = Documents.objects.create(doc_id = '1', filename = 'test.csv', author = "Paul Braynt", abstract="blah blah blah blah blah")
         response = download(HttpRequest,'1')
-        print(response)
-        print(response['Content-Disposition'])
         self.assertEqual(response['Content-Disposition'], 'attachment; filename="test.csv"')
 
         

@@ -21,7 +21,7 @@ urlpatterns = [
     url(r'^$', views.home_page, name='home'),
     url(r'^new_search', views.search, name='search'),
     url(r'^get_search_results/(.+)/$',views.get_search_results, name='get_search_results'),
-    url(r'^download/(\d+)/$',views.download, name='download'),
+    url(r'^download/(.+)/$',views.download, name='download'),
     #url(r'^admin/', include(admin.site.urls)),
 
 ]

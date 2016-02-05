@@ -1,7 +1,8 @@
 from django.shortcuts import redirect, render
 from django.http import HttpResponse
 import pysolr
-from docfinder.models import Search
+from docfinder.models import Search, Documents
+import os
 
 # Create your views here.
 
@@ -31,6 +32,12 @@ def get_search_results(request,search_terms):
                     )
 
 def download(request,doc_id):
-    response = HttpResponse()
-    response['Content-Disposition'] = 'attachment; filename="test.csv"'
+    document = Documents.objects.get(doc_id = doc_id)
+    file_name = document.filename
+    
+    os.chdir('/home/paul/MyCode/Django/test_docs')
+    content = open('%s' % file_name,'r')
+    response = HttpResponse(content,content_type = 'application/csv')
+    response['Content-Disposition'] = 'attachment; filename="%s"' % file_name
+    
     return response

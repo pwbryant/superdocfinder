@@ -1,12 +1,19 @@
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from django.test import LiveServerTestCase
-
-
+from docfinder.models import Documents
+import os
 class NewVisitorTest(LiveServerTestCase):
 
     def setUp(self):
-        self.browser = webdriver.Firefox()
+        Documents.objects.create(doc_id='1689ca84-3300-46b8-a706-3f847c909a42', filename = 'test.csv', author = "Paul Bryant", abstract = "Here is the Atrazine abstract")
+        profile = webdriver.FirefoxProfile()
+        profile.set_preference('browser.download.manager.showWhenStarting',False)
+        #profile.set_preference('browser.helperApps.neverAsk.saveToDisk','text/csv')
+        profile.set_preference('browser.download.dir','/home/paul/Downloads')
+
+
+        self.browser = webdriver.Firefox(profile)
 
 
     def tearDown(self):
@@ -70,7 +77,7 @@ class NewVisitorTest(LiveServerTestCase):
         inputbox.send_keys(Keys.ENTER) 
 
         #The page updates again with the new results
-        self.check_for_row_in_results_table('Pecticide Study')
+        self.check_for_row_in_results_table('Pesticide Study')
 
         #The User would like all papers mentioning atrazine and/or missouri
         inputbox = self.browser.find_element_by_id('id_search_term')
@@ -78,13 +85,16 @@ class NewVisitorTest(LiveServerTestCase):
         inputbox.send_keys(Keys.ENTER) 
 
         self.check_for_row_in_results_table('Big Time Atrazine Study')
-        self.check_for_row_in_results_table('Pecticide Study')
+        self.check_for_row_in_results_table('Pesticide Study')
 
         #The User sees a document they are interested in and so they
         #click on a result, whereupon the document is downloaded to their
         #local computer
-        hyperlink = self.browser.find_element_by_id("search_result_1").click()
-        
+        doc = Documents.objects.first()
+        os.chdir('/home/paul/Downloads')
+        os.remove('test.csv')
+        self.browser.find_element_by_id("search_result_%s" % doc.doc_id).click()
+        input()
         downloaded_file = open('/home/paul/Downloads/test.csv','r')
 
         self.fail('Finish the test')
