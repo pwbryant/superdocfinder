@@ -25,8 +25,8 @@ class NewVisitorTest(StaticLiveServerTestCase):
 
 
     def check_for_row_in_results_table(self,row_text):
-        table = self.browser.find_element_by_id('id_results_table')
-        rows = table.find_elements_by_tag_name('tr')
+        table = self.browser.find_element_by_id('id_results_div')
+        rows = table.find_elements_by_tag_name('p')
         self.assertIn(row_text, [row.text for row in rows])
 
     def test_layout_and_styling(self):
@@ -54,10 +54,8 @@ class NewVisitorTest(StaticLiveServerTestCase):
                 delta=5
                 )
 
-        self.fail('Finish the test')
-
     
-    def xtest_can_enter_search_term_and_retrieve_results(self):
+    def test_can_enter_search_term_and_retrieve_results(self):
         #User wants to find all documents that Waterborne has
         #concernging a variety of topics. They got to the homepage
         #of Waterborne's docfinder site
@@ -98,7 +96,7 @@ class NewVisitorTest(StaticLiveServerTestCase):
         #User hits ENTER and  the page is updated with the returned results. 
         inputbox.send_keys(Keys.ENTER)
         self.assertRegex(self.browser.current_url,'/search/display_results/')
-        self.check_for_row_in_results_table('Big Time Atrazine Study')
+        self.check_for_row_in_results_table("['Big Time Atrazine Study']")
 
         #Page Title and search bar are still there. User wants to search
         #for all papers regarding Missouri, because Waterborne carries out 
@@ -108,15 +106,15 @@ class NewVisitorTest(StaticLiveServerTestCase):
         inputbox.send_keys(Keys.ENTER) 
 
         #The page updates again with the new results
-        self.check_for_row_in_results_table('Pesticide Study')
+        self.check_for_row_in_results_table("['Pesticide Study']")
 
         #The User would like all papers mentioning atrazine and/or missouri
         inputbox = self.browser.find_element_by_id('id_search_term')
         inputbox.send_keys('atrazine Missouri')
         inputbox.send_keys(Keys.ENTER) 
 
-        self.check_for_row_in_results_table('Big Time Atrazine Study')
-        self.check_for_row_in_results_table('Pesticide Study')
+        self.check_for_row_in_results_table("['Big Time Atrazine Study']")
+        self.check_for_row_in_results_table("['Pesticide Study']")
 
         #The User sees a document they are interested in and so they
         #click on a result, whereupon the document is downloaded to their

@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="ID=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Waterborne-env Docfinder</title>
+	<!--<link href="/static/bootstrap/css/bootstrap.min.css" rel="stylesheet">-->
+	<link href="/static/base.css" rel="stylesheet">
+	<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
+	<script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+</head>
+<body>
+<div class="container">
+	<div class="row">
+		<div class="col-md-6 col-md-offset-3 jumbotron">
+			<div class="text-center">
+
+				<h1>Document Search Tool</h1>
+				<form action="/search/new_search" method="POST" >
+					<input name="search_term_text" id="id_search_term" class="form-control input-lg" placeholder="Enter search term(s)" />
+					{% csrf_token %}
+				</form>
+			</div>
+		</div>
+
+	</div>
+
+	{% block table %}
+	{% endblock %}
+</div>
+</body>
+</html>

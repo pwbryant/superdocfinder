@@ -51,7 +51,7 @@ def download(request,doc_id):
     document = Document.objects.get(doc_id = doc_id)
     file_name = document.filename
     
-    os.chdir('/home/paul/MyCode/Django/test_docs')
+    os.chdir('/home/paul/mycode/django/test_docs')
     content = open('%s' % file_name,'r')
     response = HttpResponse(content,content_type = 'application/csv')
     response['Content-Disposition'] = 'attachment; filename="%s"' % file_name 

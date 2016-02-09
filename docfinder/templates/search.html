@@ -1,13 +1,40 @@
 {% extends 'base.html' %}
 
 {% block table %}
-<table id="id_results_table" class="table">
-{% for result in search_results %}
-	{% for title in result.title %}
-	<tr><td><a id="search_result_{{ result.id }}" href='/search/download/{{ result.id }}/'>{{title}}</a></tr></td>
+<!--<table id="id_results_table" class="table">-->
+<div id="id_results_div" class="row">
+		
+	{% for result in search_results %}
+		<div class="col-md-3">
+			<div class="thumbnail">
+				<p>{{ result.title }}</p>
+				<p>{{ result.author }}</p>
+				
+				
+				
+				<button type="button" class="btn btn-info btn-sm" data-toggle="modal" data-target="#myModal{{ result.id }}"><span class="glyphicon glyphicon-eye-open">View Abstract</span></button>
+				<div class="modal fade" id="myModal{{ result.id }}" role="dialog">
+					<div class="modal-dialog">
+						<div class="modal-content">
+							<div class="modal-header">
+								<button type="button" class="close" data-dismiss="modal">&times;</button>
+								<h4 class="modal-title">Abstract</h4>
+							</div>
+							<div class="modal-body">
+								<p>{{ result.abstract }}</p>
+							</div>
+							<div class="modal-footer">
+								<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<a class="btn btn-info btn-sm" id="search_result_{{ result.id }}" href='/search/download/{{ result.id }}/' role="button"><span class="glyphicon glyphicon-download">Download</span></a>
+			</div>
+		</div>
+	{% empty %}
+		<p>No Documents Found</p>
 	{% endfor %}
-{% empty %}
-	<tr><td>No Documents Found</td></tr>
-{% endfor %}
-</table>
+</div>
 {% endblock %}
