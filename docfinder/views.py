@@ -33,17 +33,25 @@ def get_search_results(request,search_terms):
     results = solr.search(search_terms_for_solr).__dict__['docs']
     searches = Searches.objects.last()
     for solr_result in results:
-        document = Document.objects.get(doc_id = solr_result['id'])
-        Result.objects.create(doc_id = document, searches_id = searches)
+        document_objects = Document.objects.filter(doc_id = solr_result['id'])
+        if len(document_objects) > 0:
+            document = document_objects[0]
+            Result.objects.create(doc_id = document, searches_id = searches)
     return redirect('/search/display_results/%s/' % search_terms)
 
 
 def display_results(request, search_terms):
-    search_terms_for_solr = ' '.join(search_terms.split('_'))
+    search_terms = ' '.join(search_terms.split('_'))
     solr = pysolr.Solr('http://localhost:8983/solr/testcore',timeout=10)
-    results = solr.search(search_terms_for_solr).__dict__['docs']
+    results = solr.search(search_terms,sort='year desc',rows=200).__dict__['docs']
+    #results.sort(key=lambda x: x['year'],reverse=True) 
+    for result in results:
+        for key in result.keys():
+            if type(result[key]) == list:
+                result[key] = ', '.join(result[key])
+    print(type(results))
     return render(request,'search.html',
-            {'search_results':results}
+            {'search_results':results,'search_terms':search_terms}
                     )
 
 

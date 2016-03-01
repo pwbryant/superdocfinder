@@ -92,7 +92,7 @@ class SearchResultsTests(TestCase):
         self.assertTemplateUsed(response, 'search.html')
 
 
-    def test_get_search_url_resolves_to_get_search_results_view(self):
+    def test_get_search_results_url_resolves_to_get_search_results_view(self):
 
         found = resolve('/search/get_search_results/atrazine_missouri/')
         self.assertEqual(found.func, get_search_results)
@@ -121,6 +121,12 @@ class SearchResultsTests(TestCase):
         self.assertEqual(result2.searches_id, searches)
         self.assertEqual(result1.doc_id,document1)
         self.assertEqual(result2.doc_id,document2)
+
+    def test_get_search_results_handles_empty_results(self):
+        request = HttpRequest()
+
+        get_search_results(request,'junkSearch')
+        self.assertEqual(Result.objects.count(),0)
         
  
     def test_get_search_veiw_redirects_correctly_after_being_called(self):
@@ -216,7 +222,7 @@ class DownloadResultsTest(TestCase):
         document = Document.objects.create(doc_id = '1', filename = 'UT_test.csv')
         response = download(HttpRequest,'1')
         self.assertEqual(response['Content-Disposition'], 'attachment; filename="UT_test.csv"')
-        os.chdir('/home/paul/MyCode/Django/test_docs') 
+        os.chdir('/home/paul/mycode/django/test_docs') 
         doc = open('UT_test.csv','r').read()
         self.assertEqual(response.content.decode(),doc)
         

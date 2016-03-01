@@ -3,16 +3,21 @@
 {% block table %}
 <!--<table id="id_results_table" class="table">-->
 <div id="id_results_div" class="row">
-		
+	<h4>Search Results for "{{ search_terms }}"</h4>		
 	{% for result in search_results %}
-		<div class="col-md-3">
+		{% if forloop.first %}<div class="row">{% endif %}
+		<div class="col-md-4">
 			<div class="thumbnail">
+				<b>Title:</b>
 				<p>{{ result.title }}</p>
+				<b>Author(s):</b>
 				<p>{{ result.author }}</p>
+				<b>Year:</b>
+				<p>{{ result.year }}</p>
 				
 				
 				
-				<button type="button" class="btn btn-info btn-sm" data-toggle="modal" data-target="#myModal{{ result.id }}"><span class="glyphicon glyphicon-eye-open">View Abstract</span></button>
+				<button type="button" class="btn btn-info btn-sm" data-toggle="modal" data-target="#myModal{{ result.id }}"><span class="glyphicon glyphicon-eye-open">Abstract</span></button>
 				<div class="modal fade" id="myModal{{ result.id }}" role="dialog">
 					<div class="modal-dialog">
 						<div class="modal-content">
@@ -33,6 +38,8 @@
 				<a class="btn btn-info btn-sm" id="search_result_{{ result.id }}" href='/search/download/{{ result.id }}/' role="button"><span class="glyphicon glyphicon-download">Download</span></a>
 			</div>
 		</div>
+		{% if forloop.counter|divisibleby:3 %}</div><div class="row">{% endif %}
+		{% if forloop.last %}</div>{% endif %}
 	{% empty %}
 		<p>No Documents Found</p>
 	{% endfor %}
