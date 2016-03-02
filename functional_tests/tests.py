@@ -3,9 +3,24 @@ from selenium.webdriver.common.keys import Keys
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 from docfinder.models import Document
 import os
-
+import sys
 
 class NewVisitorTest(StaticLiveServerTestCase):
+    
+    @classmethod
+    def setUpClass(cls):
+        for arg in sys.argv:
+            if 'liveserver' in arg:
+                cls.server_url = 'http://' + arg.split('=')[1]
+                return
+        super().setUpClass()
+        cls.server_url = cls.live_server_url
+
+    @classmethod
+    def tearDownClass(cls):
+        if cls.server_url == cls.live_server_url:
+            super().tearDownClass()
+
 
     def setUp(self):
         Document.objects.create(doc_id='8', filename = 'test.csv', author = "Paul Bryant", abstract = "Here is the Atrazine abstract")
@@ -29,10 +44,10 @@ class NewVisitorTest(StaticLiveServerTestCase):
         rows = table.find_elements_by_tag_name('p')
         self.assertIn(row_text, [row.text for row in rows])
 
-    def dont_test_layout_and_styling(self):
+    def test_layout_and_styling(self):
         #User goes to homepage
-        self.browser.get(self.live_server_url)
-        self.browser.set_window_size(1024,768)
+        self.browser.get(self.server_url)
+        self.browser.set_window_size(1028,768)
         
         #User notices the inputbox is nicely centered
         inputbox = self.browser.find_element_by_id('id_search_term')
@@ -59,7 +74,7 @@ class NewVisitorTest(StaticLiveServerTestCase):
         #User wants to find all documents that Waterborne has
         #concernging a variety of topics. They got to the homepage
         #of Waterborne's docfinder site
-        self.browser.get(self.live_server_url)
+        self.browser.get(self.server_url)
         self.browser.implicitly_wait(3)
         #She notice the tile 'Document Finder' and a
         #a search bar:
@@ -128,4 +143,9 @@ class NewVisitorTest(StaticLiveServerTestCase):
         self.browser.find_element_by_id("search_result_%s" % doc.doc_id).click()
         input()
         downloaded_file = open('/home/paul/Downloads/test.csv','r')
+
+
+
+
+
 

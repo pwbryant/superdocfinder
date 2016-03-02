@@ -44,12 +44,11 @@ def display_results(request, search_terms):
     search_terms = ' '.join(search_terms.split('_'))
     solr = pysolr.Solr('http://localhost:8983/solr/testcore',timeout=10)
     results = solr.search(search_terms,sort='year desc',rows=200).__dict__['docs']
-    #results.sort(key=lambda x: x['year'],reverse=True) 
     for result in results:
         for key in result.keys():
             if type(result[key]) == list:
                 result[key] = ', '.join(result[key])
-    print(type(results))
+
     return render(request,'search.html',
             {'search_results':results,'search_terms':search_terms}
                     )
