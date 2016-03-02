@@ -1,0 +1,4 @@
+Django==1.8
+pysolr==3.4.0
+requests==2.9.1
+wheel==0.29.0

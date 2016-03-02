@@ -23,12 +23,11 @@ class NewVisitorTest(StaticLiveServerTestCase):
 
 
     def setUp(self):
-        Document.objects.create(doc_id='8', filename = 'test.csv', author = "Paul Bryant", abstract = "Here is the Atrazine abstract")
-        Document.objects.create(doc_id='9', filename = 'test2.csv', author = "Gary Smith", abstract = "We did a pesticide study in Missouri")
+        Document.objects.create(doc_id='1', filename = 'test.csv', author = "Paul Bryant", abstract = "Here is the Atrazine abstract")
+        Document.objects.create(doc_id='2', filename = 'test2.csv', author = "Gary Smith", abstract = "We did a pesticide study in Missouri")
         
         profile = webdriver.FirefoxProfile()
         profile.set_preference('browser.download.manager.showWhenStarting',False)
-        #profile.set_preference('browser.helperApps.neverAsk.saveToDisk','text/csv')
         profile.set_preference('browser.download.dir','/home/paul/Downloads')
 
 
