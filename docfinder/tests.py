@@ -84,7 +84,6 @@ class ModelTest(TestCase):
         self.assertEqual(saved_result.searches_id.search_id.pk,search.pk)
 
 
-
 class SearchResultsTests(TestCase):
     
     def test_uses_search_template(self):
@@ -222,7 +221,9 @@ class DownloadResultsTest(TestCase):
         document = Document.objects.create(doc_id = '1', filename = 'UT_test.csv')
         response = download(HttpRequest,'1')
         self.assertEqual(response['Content-Disposition'], 'attachment; filename="UT_test.csv"')
-        os.chdir('/home/paul/mycode/django/test_docs') 
+        BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        DOWNLOAD_DIR = os.path.abspath(os.path.join(BASE_DIR,'../docs'))
+        os.chdir(DOWNLOAD_DIR) 
         doc = open('UT_test.csv','r').read()
         self.assertEqual(response.content.decode(),doc)
         

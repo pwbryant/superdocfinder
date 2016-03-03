@@ -57,8 +57,9 @@ def display_results(request, search_terms):
 def download(request,doc_id):
     document = Document.objects.get(doc_id = doc_id)
     file_name = document.filename
-    
-    os.chdir('/home/paul/mycode/django/test_docs')
+    BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    DOWNLOAD_DIR = os.path.abspath(os.path.join(BASE_DIR,'../docs'))
+    os.chdir(DOWNLOAD_DIR)
     content = open('%s' % file_name,'r')
     response = HttpResponse(content,content_type = 'application/csv')
     response['Content-Disposition'] = 'attachment; filename="%s"' % file_name 

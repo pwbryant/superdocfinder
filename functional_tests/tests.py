@@ -7,6 +7,9 @@ import sys
 
 class NewVisitorTest(StaticLiveServerTestCase):
     
+    BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))))
+    DOWNLOAD_DIR = os.path.abspath(os.path.join(BASE_DIR, 'Downloads'))
+    
     @classmethod
     def setUpClass(cls):
         for arg in sys.argv:
@@ -23,12 +26,13 @@ class NewVisitorTest(StaticLiveServerTestCase):
 
 
     def setUp(self):
+        print('setUp')
         Document.objects.create(doc_id='1', filename = 'test.csv', author = "Paul Bryant", abstract = "Here is the Atrazine abstract")
         Document.objects.create(doc_id='2', filename = 'test2.csv', author = "Gary Smith", abstract = "We did a pesticide study in Missouri")
         
         profile = webdriver.FirefoxProfile()
         profile.set_preference('browser.download.manager.showWhenStarting',False)
-        profile.set_preference('browser.download.dir','/home/paul/Downloads')
+        profile.set_preference('browser.download.dir',self.DOWNLOAD_DIR)
 
 
         self.browser = webdriver.Firefox(profile)
@@ -75,8 +79,7 @@ class NewVisitorTest(StaticLiveServerTestCase):
         #of Waterborne's docfinder site
         self.browser.get(self.server_url)
         self.browser.implicitly_wait(3)
-        #She notice the tile 'Document Finder' and a
-        #a search bar:
+        #She notice the tile 'Document Finder' and a search bar
         self.assertIn('Waterborne-env Docfinder',self.browser.title)
         header_text = self.browser.find_element_by_tag_name('h1').text
         self.assertIn('Document Search Tool',header_text)
@@ -134,14 +137,14 @@ class NewVisitorTest(StaticLiveServerTestCase):
         #click on a result, whereupon the document is downloaded to their
         #local computer
         doc = Document.objects.first()
-        os.chdir('/home/paul/Downloads')
+        os.chdir(self.DOWNLOAD_DIR)
         try:
             os.remove('test.csv')
         except:
             pass
         self.browser.find_element_by_id("search_result_%s" % doc.doc_id).click()
         input()
-        downloaded_file = open('/home/paul/Downloads/test.csv','r')
+        downloaded_file = open(self.DOWNLOAD_DIR + '/test.csv','r')
 
 
 
