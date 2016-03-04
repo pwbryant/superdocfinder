@@ -1,79 +1,13 @@
+from .base import FunctionalTest
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
-from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 from docfinder.models import Document
 import os
-import sys
 
-class NewVisitorTest(StaticLiveServerTestCase):
-    
-    BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))))
-    DOWNLOAD_DIR = os.path.abspath(os.path.join(BASE_DIR, 'Downloads'))
-    
-    @classmethod
-    def setUpClass(cls):
-        for arg in sys.argv:
-            if 'liveserver' in arg:
-                cls.server_url = 'http://' + arg.split('=')[1]
-                return
-        super().setUpClass()
-        cls.server_url = cls.live_server_url
+class NewVisitorTest(FunctionalTest):
 
-    @classmethod
-    def tearDownClass(cls):
-        if cls.server_url == cls.live_server_url:
-            super().tearDownClass()
-
-
-    def setUp(self):
-        print('setUp')
-        Document.objects.create(doc_id='1', filename = 'test.csv', author = "Paul Bryant", abstract = "Here is the Atrazine abstract")
-        Document.objects.create(doc_id='2', filename = 'test2.csv', author = "Gary Smith", abstract = "We did a pesticide study in Missouri")
-        
-        profile = webdriver.FirefoxProfile()
-        profile.set_preference('browser.download.manager.showWhenStarting',False)
-        profile.set_preference('browser.download.dir',self.DOWNLOAD_DIR)
-
-
-        self.browser = webdriver.Firefox(profile)
-
-
-    def tearDown(self):
-        self.browser.quit()
-
-
-    def check_for_row_in_results_table(self,row_text):
-        table = self.browser.find_element_by_id('id_results_div')
-        rows = table.find_elements_by_tag_name('p')
-        self.assertIn(row_text, [row.text for row in rows])
-
-    def test_layout_and_styling(self):
-        #User goes to homepage
-        self.browser.get(self.server_url)
-        self.browser.set_window_size(1028,768)
-        
-        #User notices the inputbox is nicely centered
-        inputbox = self.browser.find_element_by_id('id_search_term')
-        self.assertAlmostEqual(
-                inputbox.location['x'] + inputbox.size['width']/2,
-                512,
-                delta=5
-                )
-
-
-        #After searching for a document the User sees that the search/results' page input box is also centered
-        inputbox.send_keys('atrazine missouri')
-        inputbox.send_keys(Keys.ENTER)
-
-        inputbox = self.browser.find_element_by_id('id_search_term')
-        self.assertAlmostEqual(
-                inputbox.location['x'] + inputbox.size['width']/2,
-                512,
-                delta=5
-                )
-
-    
     def test_can_enter_search_term_and_retrieve_results(self):
+
         #User wants to find all documents that Waterborne has
         #concernging a variety of topics. They got to the homepage
         #of Waterborne's docfinder site
@@ -102,9 +36,8 @@ class NewVisitorTest(StaticLiveServerTestCase):
         inputbox = self.browser.find_element_by_id('id_search_term')
         inputbox.send_keys('junkSearch')
         inputbox.send_keys(Keys.ENTER) 
-        
         self.check_for_row_in_results_table('No Documents Found')
- 
+         
         #she types in 'atrazine' and hits enter to get all docs regarding 
         #atrazine.
         inputbox = self.browser.find_element_by_id('id_search_term')
@@ -145,9 +78,6 @@ class NewVisitorTest(StaticLiveServerTestCase):
         self.browser.find_element_by_id("search_result_%s" % doc.doc_id).click()
         input()
         downloaded_file = open(self.DOWNLOAD_DIR + '/test.csv','r')
-
-
-
 
 
 
