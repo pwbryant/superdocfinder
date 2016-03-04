@@ -17,7 +17,7 @@ def deploy():
 
 def _create_directory_structure_if_necessary(site_folder):
     for subfolder in ('database', 'static', 'virtualenv', 'source'):
-        run('mkdir -p %s%s' % (site_folder, subfolder))
+        run('mkdir -p %s/%s' % (site_folder, subfolder))
 
 
 def _get_latest_source(source_folder):
