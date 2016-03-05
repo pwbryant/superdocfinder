@@ -6,7 +6,7 @@ import sys
 
 
 class FunctionalTest(StaticLiveServerTestCase):
-    BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))))
+    BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))))
     DOWNLOAD_DIR = os.path.abspath(os.path.join(BASE_DIR, 'Downloads'))
     
     @classmethod

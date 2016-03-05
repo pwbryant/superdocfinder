@@ -62,7 +62,6 @@ class NewVisitorTest(FunctionalTest):
         inputbox = self.browser.find_element_by_id('id_search_term')
         inputbox.send_keys('atrazine Missouri')
         inputbox.send_keys(Keys.ENTER) 
-
         self.check_for_row_in_results_table('Big Time Atrazine Study')
         self.check_for_row_in_results_table('Pesticide Study')
 
