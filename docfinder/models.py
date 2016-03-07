@@ -4,7 +4,7 @@ from django.db import models
 
 class Search(models.Model):
     
-    search_terms = models.TextField(default='',unique=True)
+    search_terms = models.TextField(unique=True)
 
 
 class Searches(models.Model):

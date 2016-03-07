@@ -23,13 +23,6 @@ class NewVisitorTest(FunctionalTest):
                 'Enter search term(s)'
                 )
 
-        #User accidentilly hits 'Enter' and searches with no search terms
-        #and nothing happens
-
-        inputbox = self.browser.find_element_by_id('id_search_term')
-        inputbox.send_keys('')
-        inputbox.send_keys(Keys.ENTER) 
-
         #User enters junkSearch, but there aren't any papers pertaining
         #to junkSearch, so a result of 'No Results' is returned
     

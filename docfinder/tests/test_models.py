@@ -1,8 +1,23 @@
 from django.test import TestCase
 from docfinder.models import Search, Document, Searches, Result
+from django.core.exceptions import ValidationError
+from django.db import IntegrityError
 
 class ModelTest(TestCase):
     
+    def test_cannot_save_empty_search(self):
+        search = Search(search_terms = '')
+        with self.assertRaises(ValidationError):
+            search.save()
+            search.full_clean()
+    
+    def test_cannot_save_duplicate_search(self):
+        Search.objects.create(search_terms = 'atrazine')
+        try:
+            Search.objects.create(search_terms = 'atrazine')
+        except IntegrityError:
+            pass
+
     def test_saving_and_retrieving_search(self):
         first_search = Search()
         first_search.search_terms = 'atrazine'

@@ -4,7 +4,7 @@ import pysolr
 from docfinder.models import Search, Document, Searches, Result
 import os
 from datetime import datetime
-
+from django.core.exceptions import ValidationError
 # Create your views here.
 
 def home_page(request):
@@ -12,20 +12,25 @@ def home_page(request):
 
 
 def search(request):
-    if len(request.POST['search_term_text'].split()) > 0:
-        search_terms = request.POST['search_term_text'].lower().split()
-        search_terms.sort()
-        search_terms_url = '_'.join(search_terms)
-        search_terms_str = ' '.join(search_terms)
-        if len(Search.objects.filter(search_terms = search_terms_str)) == 0:
-            Search.objects.create(search_terms = search_terms_str)
+    search_terms = request.POST['search_term_text'].lower().split()
+    search_terms.sort()
+    search_terms_url = '_'.join(search_terms)
+    search_terms_str = ' '.join(search_terms)
+    try:
         search = Search.objects.get(search_terms = search_terms_str)
-        Searches.objects.create(search_id = search)
-            
-        return redirect('/search/get_search_results/%s' % search_terms_url)
-    else:
-        return redirect('/')
+    except Search.DoesNotExist:
+        search = Search(search_terms = search_terms_str)
+    
+        try:
+            search.full_clean()
+            search.save()
+        except ValidationError:
+            error = "You didn't enter any search terms"
+            return render(request, 'home.html',{"error":error})
         
+    Searches.objects.create(search_id = search)
+    return redirect('/search/get_search_results/%s' % search_terms_url)
+    
 
 def get_search_results(request,search_terms):
     search_terms_for_solr = ' '.join(search_terms.split('_'))
