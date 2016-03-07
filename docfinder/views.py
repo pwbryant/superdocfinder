@@ -29,7 +29,7 @@ def search(request):
             return render(request, 'home.html',{"error":error})
         
     Searches.objects.create(search_id = search)
-    return redirect('/search/get_search_results/%s' % search_terms_url)
+    return redirect('get_search_results',search_terms_url)
     
 
 def get_search_results(request,search_terms):
@@ -42,7 +42,7 @@ def get_search_results(request,search_terms):
         if len(document_objects) > 0:
             document = document_objects[0]
             Result.objects.create(doc_id = document, searches_id = searches)
-    return redirect('/search/display_results/%s/' % search_terms)
+    return redirect('display_results', search_terms)
 
 
 def display_results(request, search_terms):
