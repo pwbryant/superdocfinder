@@ -40,5 +40,7 @@ class FunctionalTest(StaticLiveServerTestCase):
         rows = table.find_elements_by_tag_name('p')
         self.assertIn(row_text, [row.text for row in rows])
 
+    def get_search_input_box(self):
+        return self.browser.find_element_by_id('id_search_terms')
 
 

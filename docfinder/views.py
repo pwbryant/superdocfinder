@@ -13,7 +13,7 @@ def home_page(request):
 
 
 def search(request):
-    search_terms = request.POST['search_term_text'].lower().split()
+    search_terms = request.POST['search_terms'].lower().split()
     search_terms.sort()
     search_terms_url = '_'.join(search_terms)
     search_terms_str = ' '.join(search_terms)
@@ -21,13 +21,12 @@ def search(request):
         search = Search.objects.get(search_terms = search_terms_str)
     except Search.DoesNotExist:
         search = Search(search_terms = search_terms_str)
-    
         try:
             search.full_clean()
             search.save()
         except ValidationError:
             error = "You didn't enter any search terms"
-            return render(request, 'home.html',{"error":error})
+            return render(request, 'home.html',{"error":error,'form':SearchForm()})
         
     Searches.objects.create(search_id = search)
     return redirect('get_search_results',search_terms_url)
@@ -56,7 +55,7 @@ def display_results(request, search_terms):
                 result[key] = ', '.join(result[key])
 
     return render(request,'search.html',
-            {'search_results':results,'search_terms':search_terms}
+            {'search_results':results,'search_terms':search_terms,'form':SearchForm()}
                     )
 
 

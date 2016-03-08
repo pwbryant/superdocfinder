@@ -10,7 +10,7 @@ class LayoutAndStylingTest(FunctionalTest):
         self.browser.set_window_size(1028,768)
         
         #User notices the inputbox is nicely centered
-        inputbox = self.browser.find_element_by_id('id_search_term')
+        inputbox = self.get_search_input_box()
         self.assertAlmostEqual(
                 inputbox.location['x'] + inputbox.size['width']/2,
                 512,
@@ -20,7 +20,7 @@ class LayoutAndStylingTest(FunctionalTest):
 
         #After searching for a document the User sees that the search/results' page input box is also centered
         inputbox.send_keys('atrazine missouri')
-        inputbox = self.browser.find_element_by_id('id_search_term')
+        inputbox = self.get_search_input_box()
         self.assertAlmostEqual(
                 inputbox.location['x'] + inputbox.size['width']/2,
                 512,

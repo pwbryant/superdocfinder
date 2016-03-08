@@ -93,7 +93,7 @@ class SearchTests(TestCase):
  
 
     def test_validation_errors_are_sent_back_to_home_page_template(self):
-        response = self.client.post('/search/new_search',data={'search_term_text':''})
+        response = self.client.post('/search/new_search',data={'search_terms':''})
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response,'home.html')
         expected_error = escape("You didn't enter any search terms")
@@ -101,22 +101,22 @@ class SearchTests(TestCase):
 
 
     def test_invalid_search_is_not_saved(self):
-        self.client.post('/search/new_search', data={'search_term_text':''})
+        self.client.post('/search/new_search', data={'search_terms':''})
         self.assertEqual(Search.objects.count(),0)
 
 
     def test_search_func_deals_with_duplicate_search_terms(self):
         request = HttpRequest()
         request.method = 'POST'
-        request.POST['search_term_text'] = 'atrazine'
+        request.POST['search_terms'] = 'atrazine'
         
         search(request)
         
         request = HttpRequest()
         request.method = 'POST'
-        request.POST['search_term_text'] = 'atrazine'
+        request.POST['search_terms'] = 'atrazine'
         
-        response = self.client.post('/search/new_search',data={'search_term_text':'atrazine'})
+        response = self.client.post('/search/new_search',data={'search_terms':'atrazine'})
         self.assertEqual(Search.objects.count(),1)
         self.assertEqual(response.status_code, 302)
 
@@ -126,7 +126,7 @@ class SearchTests(TestCase):
     def test_search_can_save_POST_and_create_Search_and_Searches_objects(self):
         request = HttpRequest()
         request.method = 'POST'
-        request.POST['search_term_text'] = 'atrazine missouri'
+        request.POST['search_terms'] = 'atrazine missouri'
         
         response = search(request)
 
@@ -144,7 +144,7 @@ class SearchTests(TestCase):
         request.method = 'POST'
         search_terms = 'atrazine missouri'
         
-        request.POST['search_term_text'] = search_terms
+        request.POST['search_terms'] = search_terms
         
         search_terms_url ='atrazine_missouri'
         response = search(request)
