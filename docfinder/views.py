@@ -2,13 +2,14 @@ from django.shortcuts import redirect, render
 from django.http import HttpResponse
 import pysolr
 from docfinder.models import Search, Document, Searches, Result
+from docfinder.forms import SearchForm
 import os
 from datetime import datetime
 from django.core.exceptions import ValidationError
 # Create your views here.
 
 def home_page(request):
-    return render(request, 'home.html')
+    return render(request, 'home.html', {'form': SearchForm()})
 
 
 def search(request):

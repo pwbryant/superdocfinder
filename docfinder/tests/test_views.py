@@ -8,21 +8,20 @@ from datetime import datetime
 from docfinder.views import home_page, search, get_search_results, download
 from docfinder.models import Search, Document, Searches, Result
 from django.utils.html import escape
+from docfinder.forms import SearchForm
 # Create your tests here.
 
 class HomePageTest(TestCase):
+    def test_home_page_renders_home_template(self):
 
-    def test_root_url_resolves_to_home_page_view(self):
-        found = resolve('/')
-        self.assertEqual(found.func, home_page)
+        response = self.client.get('/')
+        self.assertTemplateUsed(response, 'home.html')
 
-    
-    def test_home_page_returns_correct_html(self):
-        request = HttpRequest()
-        response = home_page(request)
-        expected_html = render_to_string('home.html')
-        self.assertEqual(response.content.decode(),expected_html)
-      
+
+    def test_home_page_uses_item_form(self):
+        response = self.client.get('/')
+        self.assertIsInstance(response.context['form'], SearchForm)
+
 
 class SearchResultsTests(TestCase):
     

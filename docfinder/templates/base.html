@@ -19,7 +19,7 @@
 
 				<h1>Document Search Tool</h1>
 				<form method="POST" action="{% block form_action %}{% endblock %}" >
-					<input name="search_term_text" id="id_search_term" class="form-control input-lg" placeholder="Enter search term(s)" />
+					{{ form.search_terms }}
 					{% csrf_token %}
 					{% if error %}
 						<div id="id_error_div" class="form-group has-error">
