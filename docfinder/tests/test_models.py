@@ -74,3 +74,9 @@ class ModelTest(TestCase):
         self.assertEqual(saved_result.searches_id.pk,searches.pk)
         self.assertEqual(saved_result.searches_id.search_id.pk,search.pk)
 
+    
+    def test_string_representation(self):
+        search = Search(search_terms = 'some text')
+        self.assertEqual(str(search), 'some text')
+
+

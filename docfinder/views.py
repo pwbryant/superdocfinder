@@ -15,7 +15,7 @@ def home_page(request):
 
 def search(request):
     
-    form  = SearchForm(data=request.POST)
+    form = SearchForm(data=request.POST)
     if form.is_valid():
         search_terms = request.POST['search_terms'].lower().split()
         search_terms.sort()

@@ -6,6 +6,8 @@ class Search(models.Model):
     
     search_terms = models.TextField(unique=True)
 
+    def __str__(self):
+        return self.search_terms
 
 class Searches(models.Model):
 
