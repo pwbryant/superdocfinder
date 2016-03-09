@@ -1,7 +1,8 @@
 from django import forms
 from docfinder.models import Search
 
-EMPTY_ITEM_ERROR = "You can't have an empty Search object"
+EMPTY_SEARCH_ERROR = "You can't have an empty Search object"
+
 class SearchForm(forms.models.ModelForm):
 
     class Meta:
@@ -14,5 +15,5 @@ class SearchForm(forms.models.ModelForm):
             }),
         }
         error_messages = {
-            'search_terms': {'required':EMPTY_ITEM_ERROR}
+            'search_terms': {'required':EMPTY_SEARCH_ERROR}
         }

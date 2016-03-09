@@ -2,10 +2,11 @@ from django.shortcuts import redirect, render
 from django.http import HttpResponse
 import pysolr
 from docfinder.models import Search, Document, Searches, Result
-from docfinder.forms import SearchForm
+from docfinder.forms import SearchForm, EMPTY_SEARCH_ERROR
 import os
 from datetime import datetime
 from django.core.exceptions import ValidationError
+
 # Create your views here.
 
 def home_page(request):
@@ -13,23 +14,23 @@ def home_page(request):
 
 
 def search(request):
-    search_terms = request.POST['search_terms'].lower().split()
-    search_terms.sort()
-    search_terms_url = '_'.join(search_terms)
-    search_terms_str = ' '.join(search_terms)
-    try:
-        search = Search.objects.get(search_terms = search_terms_str)
-    except Search.DoesNotExist:
-        search = Search(search_terms = search_terms_str)
+    
+    form  = SearchForm(data=request.POST)
+    if form.is_valid():
+        search_terms = request.POST['search_terms'].lower().split()
+        search_terms.sort()
+        search_terms_url = '_'.join(search_terms)
+        search_terms_str = ' '.join(search_terms)
         try:
-            search.full_clean()
-            search.save()
-        except ValidationError:
-            error = "You didn't enter any search terms"
-            return render(request, 'home.html',{"error":error,'form':SearchForm()})
+            search = Search.objects.get(search_terms = search_terms_str)
+        except Search.DoesNotExist:
+            search = Search.objects.create(search_terms = search_terms_str)
         
-    Searches.objects.create(search_id = search)
-    return redirect('get_search_results',search_terms_url)
+        Searches.objects.create(search_id = search)
+        return redirect('get_search_results',search_terms_url)
+    
+    else:
+        return render(request, 'home.html',{'form':form})
     
 
 def get_search_results(request,search_terms):

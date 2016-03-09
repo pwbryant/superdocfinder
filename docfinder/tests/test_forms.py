@@ -1,5 +1,5 @@
 from django.test import TestCase
-from docfinder.forms import SearchForm, EMPTY_ITEM_ERROR
+from docfinder.forms import SearchForm, EMPTY_SEARCH_ERROR
 
 
 class ItemFormTest(TestCase):
@@ -15,5 +15,5 @@ class ItemFormTest(TestCase):
         self.assertFalse(form.is_valid())
         self.assertEqual(
             form.errors['search_terms'],
-            [EMPTY_ITEM_ERROR]
+            [EMPTY_SEARCH_ERROR]
         )

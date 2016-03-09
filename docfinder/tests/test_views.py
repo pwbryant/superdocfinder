@@ -8,12 +8,12 @@ from datetime import datetime
 from docfinder.views import home_page, search, get_search_results, download
 from docfinder.models import Search, Document, Searches, Result
 from django.utils.html import escape
-from docfinder.forms import SearchForm
+from docfinder.forms import SearchForm, EMPTY_SEARCH_ERROR
 # Create your tests here.
 
 class HomePageTest(TestCase):
-    def test_home_page_renders_home_template(self):
 
+    def test_home_page_renders_home_template(self):
         response = self.client.get('/')
         self.assertTemplateUsed(response, 'home.html')
 
@@ -24,16 +24,22 @@ class HomePageTest(TestCase):
 
 
 class SearchResultsTests(TestCase):
-    
+
+    def test_displays_search_form(self):
+        response = self.client.get('/search/display_results/atrazine/')
+        self.assertIsInstance(response.context['form'], SearchForm)
+        self.assertContains(response, 'name="search_terms"')
+
+
     def test_uses_search_template(self):
         response = self.client.get("/search/display_results/atrazine_missouri/")
         self.assertTemplateUsed(response, 'search.html')
 
 
     def test_get_search_results_url_resolves_to_get_search_results_view(self):
-
         found = resolve('/search/get_search_results/atrazine_missouri/')
         self.assertEqual(found.func, get_search_results)
+
 
     def test_get_search_results_creates_results_objects(self):
 
@@ -59,6 +65,7 @@ class SearchResultsTests(TestCase):
         self.assertEqual(result2.searches_id, searches)
         self.assertEqual(result1.doc_id,document1)
         self.assertEqual(result2.doc_id,document2)
+
 
     def test_get_search_results_handles_empty_results(self):
         request = HttpRequest()
@@ -87,41 +94,48 @@ class SearchResultsTests(TestCase):
 
 class SearchTests(TestCase):
      
+    def post_invalid_input(self):
+        return self.client.post(
+            '/search/new_search',
+            data={'search_terms': ''}
+        )
+    
+
+    def test_for_invalid_nothing_saved_to_db(self):
+        self.post_invalid_input()
+        self.assertEqual(Search.objects.count(), 0)
+
+
+    def test_for_invalid_input_renders_home_template(self):
+        response = self.post_invalid_input() 
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'home.html')
+
+
+    def test_for_invalid_input_passes_form_to_template(self):
+        response = self.post_invalid_input()
+        self.assertIsInstance(response.context['form'], SearchForm)
+
+
+    def test_validation_errors_are_shown_on_home_page(self):
+        response = self.post_invalid_input()
+        self.assertContains(response, escape(EMPTY_SEARCH_ERROR))
+
+
+    def test_search_func_deals_with_duplicate_search_terms(self):
+        response = self.client.post('/search/new_search',data={'search_terms':'atrazine'})
+        self.assertEqual(Search.objects.count(),1)
+        self.assertEqual(response.status_code, 302)
+        
+        response = self.client.post('/search/new_search',data={'search_terms':'atrazine'})
+        self.assertEqual(Search.objects.count(),1)
+        self.assertEqual(response.status_code, 200)
+
+
     def test_search_url_resolves_to_search_view(self):
         found = resolve('/search/new_search')
         self.assertEqual(found.func, search)
  
-
-    def test_validation_errors_are_sent_back_to_home_page_template(self):
-        response = self.client.post('/search/new_search',data={'search_terms':''})
-        self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response,'home.html')
-        expected_error = escape("You didn't enter any search terms")
-        self.assertContains(response, expected_error)
-
-
-    def test_invalid_search_is_not_saved(self):
-        self.client.post('/search/new_search', data={'search_terms':''})
-        self.assertEqual(Search.objects.count(),0)
-
-
-    def test_search_func_deals_with_duplicate_search_terms(self):
-        request = HttpRequest()
-        request.method = 'POST'
-        request.POST['search_terms'] = 'atrazine'
-        
-        search(request)
-        
-        request = HttpRequest()
-        request.method = 'POST'
-        request.POST['search_terms'] = 'atrazine'
-        
-        response = self.client.post('/search/new_search',data={'search_terms':'atrazine'})
-        self.assertEqual(Search.objects.count(),1)
-        self.assertEqual(response.status_code, 302)
-
-
-
 
     def test_search_can_save_POST_and_create_Search_and_Searches_objects(self):
         request = HttpRequest()
