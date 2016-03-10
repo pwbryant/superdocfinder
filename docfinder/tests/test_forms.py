@@ -11,14 +11,7 @@ class SearchFormTest(TestCase):
 
 
     def test_form_validation_for_blank_items(self):
-        form = SearchForm(data={'text':''})
+        form = SearchForm(data={'search_terms':''})
         self.assertFalse(form.is_valid())
-        self.assertEqual(
-            form.errors['search_terms'],
-            [EMPTY_SEARCH_ERROR]
-        )
 
-    def test_form_save_handles_saving_a_search(self):
-        form = SearchForm(data={'search_terms': 'atrazine'})
-        new_search = form.save()
 

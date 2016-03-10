@@ -1,19 +1,16 @@
 from django import forms
-from docfinder.models import Search
 
-EMPTY_SEARCH_ERROR = "You can't have an empty Search object"
+EMPTY_SEARCH_ERROR = "enter search terms"
 
-class SearchForm(forms.models.ModelForm):
+class SearchForm(forms.Form):
+    search_terms = forms.CharField(max_length=100,required=True,error_messages = {'required': EMPTY_SEARCH_ERROR},widget=forms.TextInput(attrs={'placeholder': 'Enter search term(s)',
+                    'class': 'form-control input-lg',
+                })
+            )
+    
+ 
 
-    class Meta:
-        model = Search
-        fields = ('search_terms',)
-        widgets = {
-            'search_terms': forms.fields.TextInput(attrs={
-                'placeholder': 'Enter search term(s)',
-                'class': 'form-control input-lg',
-            }),
-        }
-        error_messages = {
-            'search_terms': {'required':EMPTY_SEARCH_ERROR}
-        }
+
+
+    
+        

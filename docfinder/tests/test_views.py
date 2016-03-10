@@ -129,7 +129,7 @@ class SearchTests(TestCase):
         
         response = self.client.post('/search/new_search',data={'search_terms':'atrazine'})
         self.assertEqual(Search.objects.count(),1)
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, 302)
 
 
     def test_search_url_resolves_to_search_view(self):
