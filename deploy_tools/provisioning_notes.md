@@ -8,11 +8,13 @@ Provisioning a new site
 * Git
 * pip
 * virtualenv
+* psycopg2
+* postgresql
 
 eg, on Ubuntu:
 
-	sudo apt-get install nginx git python3 python3-pip
-	sudo pip3 install virtualenv
+	sudo apt-get install nginx git python3 python3-pip python3-dev libq-dev postgresql postgresql-contrib
+	sudo pip3 install virtualenv psycopg2
 
 ## Nginx Virtual Host config
 

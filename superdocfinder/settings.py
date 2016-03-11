@@ -72,7 +72,7 @@ WSGI_APPLICATION = 'superdocfinder.wsgi.application'
 
 
 # Database
-# https://docs.djangoproject.com/en/1.8/ref/settings/#databases
+# https://docs.djangoproject.com/en/1.8/ref/settings/#idatabases
 
 DATABASES = {
     'default': {
@@ -80,6 +80,7 @@ DATABASES = {
         'NAME': os.path.join(BASE_DIR, '../database/db.sqlite3'),
     }
 }
+
 
 
 # Internationalization

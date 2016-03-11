@@ -16,7 +16,7 @@ def deploy():
 
 
 def _create_directory_structure_if_necessary(site_folder):
-    for subfolder in ('database', 'static', 'virtualenv', 'source'):
+    for subfolder in ('docs', 'database', 'static', 'virtualenv', 'source'):
         run('mkdir -p %s/%s' % (site_folder, subfolder))
 
 
@@ -36,6 +36,14 @@ def _update_settings(source_folder, site_name):
         'ALLOWED_HOSTS = .+$',
         'ALLOWED_HOSTS = ["%s"]' % (site_name,)
     )
+    #run('cd %s && sed s/\'ENGINE\'.*$/\"ENGINE\":\ \ \'django.db.backends.postgresql_psycopg2\'/ %s > tmp && mv tmp %s' % (source_folder,settings_path, settings_path))
+    run('cd %s && sed s/\\\'ENGINE\\\'.*$/\\\'ENGINE\\\':\ \\\'django.db.backends.postgresql_psycopg2\\\',/ %s > tmp && mv tmp %s' % (source_folder,settings_path, settings_path))
+    run('cd %s && sed s/\\\'NAME\\\'.*$/\\\'NAME\\\':\ \\\'docfinder\\\',/ %s > tmp && mv tmp %s' % (source_folder,settings_path, settings_path))
+    run('cd %s && sed /\\\'NAME\\\'.*$/a"\\\t"\\\'USER\\\':\ \\\'waterborne\\\', %s > tmp && mv tmp %s' % (source_folder,settings_path, settings_path))
+    run('cd %s && sed /\\\'USER\\\'.*$/a"\\\t"\\\'PASSWORD\\\':\ \\\'123waterborne321!\\\', %s > tmp && mv tmp %s' % (source_folder,settings_path, settings_path))
+    run('cd %s && sed /\\\'PASSWORD\\\'.*$/a"\\\t"\\\'HOST\\\':\ \\\'localhost\\\', %s > tmp && mv tmp %s' % (source_folder,settings_path, settings_path))
+    run('cd %s && sed /\\\'HOST\\\'.*$/a"\\\t"\\\'PORT\\\':\ \\\'\\\', %s > tmp && mv tmp %s' % (source_folder,settings_path, settings_path))
+
     secret_key_file = source_folder + '/superdocfinder/secret_key.py'
     if not exists(secret_key_file):
         chars = 'abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*(-_=+)'
@@ -58,6 +66,7 @@ def _update_static_files(source_folder):
 
 
 def _update_database(source_folder):
+    run('sudo su postgres && psql && CREATE DATABASE docfinder')
     run('cd %s && ../virtualenv/bin/python3 manage.py migrate --noinput' % (source_folder,))
 
 
