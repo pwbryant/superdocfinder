@@ -20,6 +20,9 @@
 				<h1>Document Search Tool</h1>
 				<form method="POST" action="{% block form_action %}{% endblock %}" >
 					{{ form.search_terms }}
+					<div class='text-left'>
+				        {{ form.choice_field }}	
+					</div>
 					{% csrf_token %}
 					{% if form.errors %}
 						<div class="form-group has-error">

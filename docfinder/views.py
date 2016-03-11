@@ -49,7 +49,7 @@ def get_search_results(request,search_terms):
 def display_results(request, search_terms):
     search_terms = ' '.join(search_terms.split('_'))
     solr = pysolr.Solr('http://localhost:8983/solr/testcore',timeout=10)
-    results = solr.search(search_terms,sort='year desc',rows=200).__dict__['docs']
+    results = solr.search(search_terms,sort='year desc').__dict__['docs']
     for result in results:
         for key in result.keys():
             if type(result[key]) == list:
