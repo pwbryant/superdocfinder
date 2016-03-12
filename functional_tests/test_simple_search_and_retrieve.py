@@ -14,6 +14,8 @@ class NewVisitorTest(FunctionalTest):
         self.browser.get(self.server_url)
         self.browser.implicitly_wait(3)
         #She notice the tile 'Document Finder' and a search bar
+        #as well as radio buttons 'relevance' and 'Year' with
+        #'relevance' selected
         self.assertIn('Waterborne-env Docfinder',self.browser.title)
         header_text = self.browser.find_element_by_tag_name('h1').text
         self.assertIn('Document Search Tool',header_text)
@@ -22,10 +24,15 @@ class NewVisitorTest(FunctionalTest):
                 inputbox.get_attribute('placeholder'),
                 'Enter search term(s)'
                 )
+        relevance_radio_button = self.browser.find_element_by_id('id_choice_field_0')
+        year_radio_button = self.browser.find_element_by_id('id_choice_field_1')
+        self.assertEqual('1',relevance_radio_button.get_attribute('value'))
+        self.assertTrue(relevance_radio_button.get_attribute('checked'))
+        self.assertEqual('2',year_radio_button.get_attribute('value'))
+        self.assertFalse(year_radio_button.get_attribute('checked'))
 
         #User enters junkSearch, but there aren't any papers pertaining
         #to junkSearch, so a result of 'No Results' is returned
-    
         inputbox = self.get_search_input_box()
         inputbox.send_keys('junkSearch')
         inputbox.send_keys(Keys.ENTER) 
@@ -58,6 +65,41 @@ class NewVisitorTest(FunctionalTest):
         self.check_for_row_in_results_table('Big Time Atrazine Study')
         self.check_for_row_in_results_table('Pesticide Study')
 
+        #The User want to have the results displayed by year, in descending
+        #order. The User notices that the first result is from 2016
+        
+        year_radio_button = self.browser.find_element_by_id('id_choice_field_1')
+        year_radio_button.click()
+        self.assertTrue(year_radio_button.get_attribute('checked'))
+
+        inputbox = self.get_search_input_box()
+        inputbox.send_keys('atrazine Missouri')
+        inputbox.send_keys(Keys.ENTER) 
+        self.check_for_row_in_results_table('Big Time Atrazine Study')
+        table = self.browser.find_element_by_id('id_results_div')
+        rows = table.find_elements_by_tag_name('p')
+        year = rows[2].text
+        self.assertEqual(year,'2016')
+        
+       
+        # The User does not like the order of the results and would rather 
+        # they be sorted by relevance, she notices the first result if from
+        # 2013
+        year_radio_button = self.browser.find_element_by_id('id_choice_field_0')
+        year_radio_button.click()
+        self.assertTrue(year_radio_button.get_attribute('checked'))
+
+        inputbox = self.get_search_input_box()
+        inputbox.send_keys('atrazine Missouri')
+        inputbox.send_keys(Keys.ENTER) 
+        self.check_for_row_in_results_table('Big Time Atrazine Study')
+        table = self.browser.find_element_by_id('id_results_div')
+        rows = table.find_elements_by_tag_name('p')
+        year = rows[2].text
+        self.assertEqual(year,'2013')
+
+ 
+        
         #The User sees a document they are interested in and so they
         #click on a result, whereupon the document is downloaded to their
         #local computer

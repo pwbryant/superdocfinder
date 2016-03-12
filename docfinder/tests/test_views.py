@@ -5,7 +5,7 @@ from django.template.loader import render_to_string
 import pysolr
 import os
 from datetime import datetime
-from docfinder.views import home_page, search, get_search_results, download
+from docfinder.views import home_page, search, get_search_results, display_results, download
 from docfinder.models import Search, Document, Searches, Result
 from django.utils.html import escape
 from docfinder.forms import SearchForm, EMPTY_SEARCH_ERROR
@@ -24,6 +24,19 @@ class HomePageTest(TestCase):
 
 
 class SearchResultsTests(TestCase):
+
+    def test_display_results_in_correct_order(self):
+
+        print('correct order test')
+        #not sorted
+        request = HttpRequest()
+        response = display_results(request,'atrazine_missouri_1')
+        self.assertIn('2013',str(response.content).split('Year:')[1])
+
+        #sorted by year
+        request = HttpRequest()
+        response = display_results(request,'atrazine_missouri_2')
+        self.assertIn('2016',str(response.content).split('Year:')[1])
 
     def test_displays_search_form(self):
         response = self.client.get('/search/display_results/atrazine/')
@@ -54,7 +67,7 @@ class SearchResultsTests(TestCase):
         document1.save()
         document2.save()
 
-        get_search_results(request,'atrazine_missouri')
+        get_search_results(request,'atrazine_missouri_1')
     
         newly_saved_results = Result.objects.all()
         result1 = newly_saved_results[0]
@@ -123,11 +136,11 @@ class SearchTests(TestCase):
 
 
     def test_search_func_deals_with_duplicate_search_terms(self):
-        response = self.client.post('/search/new_search',data={'search_terms':'atrazine'})
+        response = self.client.post('/search/new_search',data={'search_terms':'atrazine','choice_field':'1'})
         self.assertEqual(Search.objects.count(),1)
         self.assertEqual(response.status_code, 302)
         
-        response = self.client.post('/search/new_search',data={'search_terms':'atrazine'})
+        response = self.client.post('/search/new_search',data={'search_terms':'atrazine','choice_field':'1'})
         self.assertEqual(Search.objects.count(),1)
         self.assertEqual(response.status_code, 302)
 
@@ -141,6 +154,7 @@ class SearchTests(TestCase):
         request = HttpRequest()
         request.method = 'POST'
         request.POST['search_terms'] = 'atrazine missouri'
+        request.POST['choice_field'] = '1'
         
         response = search(request)
 
@@ -159,8 +173,9 @@ class SearchTests(TestCase):
         search_terms = 'atrazine missouri'
         
         request.POST['search_terms'] = search_terms
+        request.POST['choice_field'] = '1'
         
-        search_terms_url ='atrazine_missouri'
+        search_terms_url ='atrazine_missouri_1'
         response = search(request)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response['location'],'/search/get_search_results/%s' % search_terms_url)
