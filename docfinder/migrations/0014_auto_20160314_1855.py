@@ -11,7 +11,10 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.AlterField(
+        migrations.RemoveField(
+            model_name='document',
+            name='doc_id'),
+        migrations.AddField(
             model_name='document',
             name='doc_id',
             field=models.IntegerField(unique=True),
