@@ -9,7 +9,9 @@ from docfinder.views import home_page, search, get_search_results, display_resul
 from docfinder.models import Search, Document, Searches, Result
 from django.utils.html import escape
 from docfinder.forms import SearchForm, EMPTY_SEARCH_ERROR
+from django.db import transaction
 # Create your tests here.
+
 
 class HomePageTest(TestCase):
 
@@ -27,7 +29,6 @@ class SearchResultsTests(TestCase):
 
     def test_display_results_in_correct_order(self):
 
-        print('correct order test')
         #not sorted
         request = HttpRequest()
         response = display_results(request,'atrazine_missouri_1')
@@ -37,6 +38,13 @@ class SearchResultsTests(TestCase):
         request = HttpRequest()
         response = display_results(request,'atrazine_missouri_2')
         self.assertIn('2016',str(response.content).split('Year:')[1])
+
+    
+    def test_get_search_results_renders_search_html_for_backend_error(self):
+        Search.objects.create(search_terms='atrazine')
+        response = self.client.get("/search/get_search_results/atrazine_1")
+        self.assertTemplateUsed(response, 'search.html')
+
 
     def test_displays_search_form(self):
         response = self.client.get('/search/display_results/atrazine/')
@@ -61,8 +69,8 @@ class SearchResultsTests(TestCase):
         search.save()
         searches = Searches(search_id = search,time=datetime.now())
         searches.save()
-        document1 = Document(doc_id = '1', filename = 'test.csv', author="Paul Bryant", abstract = "Here is the atrazine abstract")
-        document2 = Document(doc_id = '2', filename = 'test2.csv', author="Gill Humphry", abstract = "We studied stuff")
+        document1 = Document(doc_id = '1', filename = 'test.csv', author="Paul Bryant", title = "Here is the atrazine title")
+        document2 = Document(doc_id = '2', filename = 'test2.csv', author="Gill Humphry", title = "document 2 title")
 
         document1.save()
         document2.save()
@@ -74,32 +82,33 @@ class SearchResultsTests(TestCase):
         result2 = newly_saved_results[1]
 
         self.assertEqual(Result.objects.count(),2)
-        self.assertEqual(result1.searches_id, searches)
-        self.assertEqual(result2.searches_id, searches)
         self.assertEqual(result1.doc_id,document1)
         self.assertEqual(result2.doc_id,document2)
 
 
-    def test_get_search_results_handles_empty_results(self):
-        request = HttpRequest()
-
-        get_search_results(request,'junkSearch')
-        self.assertEqual(Result.objects.count(),0)
-        
- 
-    def test_get_search_veiw_redirects_correctly_after_being_called(self):
+    def test_get_search_results_creates_Searches_objects(self):
         request = HttpRequest()
         search = Search(search_terms = 'atrazine missouri')
         search.save()
-        searches = Searches(search_id = search,time=datetime.now())
-        searches.save()
-        document1 = Document(doc_id = '1', filename = 'test.csv', author="Paul Bryant", abstract = "Here is the atrazine abstract")
-        document2 = Document(doc_id = '2', filename = 'test2.csv', author="Gill Humphry", abstract = "We studied stuff")
+        get_search_results(request,'atrazine_missouri_1')
+        newly_saved_Searches = Searches.objects.all()[0]
+        self.assertEqual(Searches.objects.count(),1)
+        self.assertEqual(newly_saved_Searches.search_id,search)
 
-        document1.save()
-        document2.save()
 
-        search_terms_url = 'atrazine_missouri'
+    def test_get_search_results_handles_empty_results(self):
+        request = HttpRequest()
+        Search.objects.create(search_terms = 'junkSearch')
+        get_search_results(request,'junkSearch_1')
+        self.assertEqual(Result.objects.count(),0)
+        
+ 
+    def test_get_search_results_veiw_redirects_correctly_after_being_called(self):
+        request = HttpRequest()
+        search = Search(search_terms = 'atrazine')
+        search.save()
+        Document.objects.create(doc_id='1')
+        search_terms_url = 'atrazine_1'
         response = get_search_results(request,search_terms_url)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response['location'],'/search/display_results/%s/' % search_terms_url)
@@ -136,11 +145,12 @@ class SearchTests(TestCase):
 
 
     def test_search_func_deals_with_duplicate_search_terms(self):
-        response = self.client.post('/search/new_search',data={'search_terms':'atrazine','choice_field':'1'})
-        self.assertEqual(Search.objects.count(),1)
-        self.assertEqual(response.status_code, 302)
-        
-        response = self.client.post('/search/new_search',data={'search_terms':'atrazine','choice_field':'1'})
+        Search.objects.create(search_terms = 'atrazine')
+        request = HttpRequest()
+        request.method = 'POST'
+        request.POST['search_terms'] = 'atrazine'
+        request.POST['choice_field'] = '1'
+        response = search(request)
         self.assertEqual(Search.objects.count(),1)
         self.assertEqual(response.status_code, 302)
 
@@ -150,7 +160,7 @@ class SearchTests(TestCase):
         self.assertEqual(found.func, search)
  
 
-    def test_search_can_save_POST_and_create_Search_and_Searches_objects(self):
+    def test_search_can_save_POST_and_create_Search_objects(self):
         request = HttpRequest()
         request.method = 'POST'
         request.POST['search_terms'] = 'atrazine missouri'
@@ -159,12 +169,8 @@ class SearchTests(TestCase):
         response = search(request)
 
         self.assertEqual(Search.objects.count(),1)
-        self.assertEqual(Searches.objects.count(),1)
         newly_saved_search = Search.objects.first()
-        newly_saved_searches = Searches.objects.first()
         self.assertEqual(newly_saved_search.search_terms, 'atrazine missouri')
-        self.assertEqual(newly_saved_searches.search_id.pk,newly_saved_search.pk)
-        self.assertEqual(type(datetime.now()),type(newly_saved_searches.time))
 
 
     def test_search_redirects_correctly_after_POST(self):

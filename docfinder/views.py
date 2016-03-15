@@ -6,7 +6,7 @@ from docfinder.forms import SearchForm, EMPTY_SEARCH_ERROR
 import os
 from datetime import datetime
 from django.core.exceptions import ValidationError
-
+from django.db import IntegrityError
 # Create your views here.
 
 def home_page(request):
@@ -27,11 +27,11 @@ def search(request):
         search_terms_url = '_'.join(search_terms + [search_results_order])
         search_terms_str = ' '.join(search_terms)
         try:
-            search = Search.objects.get(search_terms = search_terms_str)
-        except Search.DoesNotExist:
-            search = Search.objects.create(search_terms = search_terms_str)
-        
-        Searches.objects.create(search_id = search)
+            search = Search(search_terms = search_terms_str)
+            search.full_clean()
+            search.save()
+        except ValidationError:
+            pass 
         return redirect('get_search_results',search_terms_url)
     
     else:
@@ -40,14 +40,23 @@ def search(request):
 
 def get_search_results(request,search_terms):
     search_terms_for_solr = ' '.join(search_terms.split('_')[:-1])
+    search_terms_str = search_terms[:-2].replace('_',' ')
     solr = pysolr.Solr('http://localhost:8983/solr/testcore',timeout=10)
     results = solr.search(search_terms_for_solr).__dict__['docs']
-    searches = Searches.objects.last()
-    for solr_result in results:
-        document_objects = Document.objects.filter(doc_id = solr_result['id'])
-        if len(document_objects) > 0:
-            document = document_objects[0]
-            Result.objects.create(doc_id = document, searches_id = searches)
+    search = Search.objects.get(search_terms = search_terms_str)
+    searches = Searches.objects.create(search_id = search)
+    if len(results) > 0:
+        for solr_result in results:
+            document_objects = Document.objects.filter(doc_id = solr_result['id'])
+            if len(document_objects) > 0:
+                document = document_objects[0]
+                Result.objects.create(doc_id = document, searches_id = searches)
+            else:
+                form = SearchForm(initial={'choice_field':'1'})
+                admin_error = 'See Admin about search term(s) "%s"' % search_terms_str
+                return render(request,'search.html',
+                        {'admin_error':admin_error,'search_terms':search_terms,'form':form})
+
     return redirect('display_results', search_terms)
 
 

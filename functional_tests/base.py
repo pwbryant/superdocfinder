@@ -24,8 +24,8 @@ class FunctionalTest(StaticLiveServerTestCase):
             super().tearDownClass()
 
     def setUp(self):
-        Document.objects.create(doc_id='1', filename = 'test.csv', author = "Paul Bryant", abstract = "Here is the Atrazine abstract")
-        Document.objects.create(doc_id='2', filename = 'test2.csv', author = "Gary Smith", abstract = "We did a pesticide study in Missouri")
+        Document.objects.create(doc_id='1', filename = 'test.csv', author = "Paul Bryant", title = "Here is the Atrazine title")
+        Document.objects.create(doc_id='2', filename = 'test2.csv', author = "Gary Smith", title = "title - We did a pesticide study in Missouri")
         
         profile = webdriver.FirefoxProfile()
         profile.set_preference('browser.download.manager.showWhenStarting',False)

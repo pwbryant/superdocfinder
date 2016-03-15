@@ -4,9 +4,22 @@ import time
 from docfinder.forms import EMPTY_SEARCH_ERROR
 
 class SearchValidationTest(FunctionalTest):
+
     
     def get_error_element(self):
         return self.browser.find_element_by_css_selector('.has-error')
+
+    def test_users_search_returns_results_not_attached_to_docs(self):
+        # User searches for 'atrazine' and though this get results on 
+        # the bacend, the results have been incorretly tited to a document 
+        # in the database and thus the User recieves a message urging the 
+        # User to contact the Admin.
+        
+        self.browser.get(self.server_url)
+        self.get_search_input_box().send_keys('watershed\n')
+        table = self.browser.find_element_by_id('id_results_div')
+        error = table.find_element_by_tag_name('h1')
+        self.assertEqual(error.text,'See Admin about search term(s) "watershed"')
 
 
     def test_error_messages_are_cleared_on_input(self):

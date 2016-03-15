@@ -17,10 +17,10 @@ class Searches(models.Model):
 
 class Document(models.Model):
     
-    doc_id = models.TextField(default='',unique=True)
-    filename = models.TextField(default='',unique=True)
-    author = models.TextField(default= '')
-    abstract = models.TextField(default='')
+    doc_id = models.IntegerField(unique=True)
+    filename = models.TextField(unique=True)
+    author = models.TextField()
+    title = models.TextField(unique=True)
 
 
 class Result(models.Model):

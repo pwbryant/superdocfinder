@@ -48,7 +48,7 @@ class ModelTest(TestCase):
 
 
     def test_saving_and_retrieving_documents(self):
-        document = Document(doc_id = '1', filename='test.pdf', author="Slick Willy",abstract='here is an abstract')
+        document = Document(doc_id = '1', filename='test.pdf', author="Slick Willy",title='document 1')
         document.save()
         saved_document = Document.objects.first()
         self.assertEqual(saved_document.pk,document.pk)
@@ -59,7 +59,7 @@ class ModelTest(TestCase):
         search.save()
         searches = Searches(search_id = search)
         searches.save()
-        document = Document(doc_id = '1', filename='test.pdf', author="Slick Willy",abstract='here is an abstract')
+        document = Document(doc_id = '1', filename='test.pdf', author="Slick Willy",title='here is an title')
         document.save()
         
         result = Result(doc_id = document, searches_id = searches)
