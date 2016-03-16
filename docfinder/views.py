@@ -41,13 +41,13 @@ def search(request):
 def get_search_results(request,search_terms):
     search_terms_for_solr = ' '.join(search_terms.split('_')[:-1])
     search_terms_str = search_terms[:-2].replace('_',' ')
-    solr = pysolr.Solr('http://localhost:8983/solr/testcore',timeout=10)
+    solr = pysolr.Solr('http://localhost:8983/solr/docfinder',timeout=10)
     results = solr.search(search_terms_for_solr).__dict__['docs']
     search = Search.objects.get(search_terms = search_terms_str)
     searches = Searches.objects.create(search_id = search)
     if len(results) > 0:
         for solr_result in results:
-            document_objects = Document.objects.filter(doc_id = solr_result['id'])
+            document_objects = Document.objects.filter(doc_id = solr_result['sid'][0])
             if len(document_objects) > 0:
                 document = document_objects[0]
                 Result.objects.create(doc_id = document, searches_id = searches)
@@ -63,7 +63,7 @@ def get_search_results(request,search_terms):
 def display_results(request, search_terms):
     search_results_order = search_terms.split('_')[-1]
     search_terms = ' '.join(search_terms.split('_')[:-1])
-    solr = pysolr.Solr('http://localhost:8983/solr/testcore',timeout=10)
+    solr = pysolr.Solr('http://localhost:8983/solr/docfinder',timeout=10)
     if search_results_order == '2':
         results = solr.search(search_terms,sort='year desc').__dict__['docs']
     else:
@@ -71,7 +71,8 @@ def display_results(request, search_terms):
     for result in results:
         for key in result.keys():
             if type(result[key]) == list:
-                result[key] = ', '.join(result[key])
+                #result[key] = ', '.join(result[key])
+                result[key] = result[key][0]
     return render(request,'search.html',
             {'search_results':results,'search_terms':search_terms,'form':SearchForm(initial={'choice_field':'1'})})
 
@@ -82,7 +83,7 @@ def download(request,doc_id):
     BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     DOWNLOAD_DIR = os.path.abspath(os.path.join(BASE_DIR,'../docs'))
     os.chdir(DOWNLOAD_DIR)
-    content = open('%s' % file_name,'r')
-    response = HttpResponse(content,content_type = 'application/csv')
+    content = open('%s' % file_name,'rb')
+    response = HttpResponse(content,content_type = 'application/pdf')
     response['Content-Disposition'] = 'attachment; filename="%s"' % file_name 
     return response
