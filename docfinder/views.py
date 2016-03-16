@@ -39,6 +39,7 @@ def search(request):
     
 
 def get_search_results(request,search_terms):
+
     search_terms_for_solr = ' '.join(search_terms.split('_')[:-1])
     search_terms_str = search_terms[:-2].replace('_',' ')
     solr = pysolr.Solr('http://localhost:8983/solr/docfinder',timeout=10)
