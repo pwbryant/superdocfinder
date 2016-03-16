@@ -63,7 +63,6 @@ class SearchResultsTests(TestCase):
 
 
     def test_get_search_results_creates_results_objects(self):
-
         request = HttpRequest()
         search = Search(search_terms = 'atrazine missouri')
         search.save()
@@ -119,7 +118,7 @@ class SearchTests(TestCase):
     def post_invalid_input(self):
         return self.client.post(
             '/search/new_search',
-            data={'search_terms': ''}
+            data={'search_terms': '','choice_field':'1'}
         )
     
 

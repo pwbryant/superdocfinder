@@ -54,7 +54,7 @@ class SearchValidationTest(FunctionalTest):
         #The User again hits Enter with an empty search bar
 
         self.get_search_input_box().send_keys('\n')
-        time.sleep(1) 
+        time.sleep(2) 
         #A similar error message is displayed
         error = self.get_error_element()
         self.assertEqual(error.text, EMPTY_SEARCH_ERROR)
