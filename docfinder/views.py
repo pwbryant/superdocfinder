@@ -40,11 +40,12 @@ def search(request):
 
 def get_search_results(request,search_terms):
     results_ordering = search_terms[-1]
-    search_terms_for_solr = ' '.join(search_terms.split('_')[:-1])
-    search_terms_str = search_terms[:-2].replace('_',' ')
+    search_terms_for_sql = search_terms[:-2].replace('_',' ')
+    search_terms_for_solr = search_terms[:-2].replace('_','+')
+    solr_search = '"%s"^3 OR partialSearch:%s^2 OR %s' %(search_terms_for_solr,search_terms_for_solr,search_terms_for_solr)
     solr = pysolr.Solr('http://localhost:8983/solr/testcore',timeout=10)
-    results = solr.search(search_terms_for_solr).__dict__['docs']
-    search = Search.objects.get(search_terms = search_terms_str)
+    results = solr.search(solr_search).__dict__['docs']
+    search = Search.objects.get(search_terms = search_terms_for_sql)
     searches = Searches.objects.create(search_id = search)
     if len(results) > 0:
         for solr_result in results:
@@ -54,7 +55,7 @@ def get_search_results(request,search_terms):
                 Result.objects.create(doc_id = document, searches_id = searches)
             else:
                 form = SearchForm(initial={'choice_field':results_ordering})
-                admin_error = 'See Admin about search term(s) "%s"' % search_terms_str
+                admin_error = 'See Admin about search term(s) "%s"' % search_terms_for_sql
                 return render(request,'search.html',
                         {'admin_error':admin_error,'search_terms':search_terms,'form':form})
 
@@ -63,18 +64,21 @@ def get_search_results(request,search_terms):
 
 def display_results(request, search_terms):
     results_ordering = search_terms[-1]
-    search_terms = ' '.join(search_terms.split('_')[:-1])
+    search_terms_for_display = search_terms[:-2].replace('_',' ')
+    search_terms_for_solr = search_terms[:-2].replace('_','+')
+    solr_search = '"%s"^3 OR partialSearch:%s^2 OR %s' %(search_terms_for_solr,search_terms_for_solr,search_terms_for_solr)
+
     solr = pysolr.Solr('http://localhost:8983/solr/testcore',timeout=10)
     if results_ordering == '2':
-        results = solr.search(search_terms,sort='year desc').__dict__['docs']
+        results = solr.search(solr_search,sort='year desc').__dict__['docs']
     else:
-        results = solr.search(search_terms).__dict__['docs']
+        results = solr.search(solr_search).__dict__['docs']
     for result in results:
         for key in result.keys():
             if type(result[key]) == list:
                 result[key] = result[key][0]
     return render(request,'search.html',
-            {'search_results':results,'search_terms':search_terms,'form':SearchForm(initial={'choice_field':results_ordering})})
+            {'search_results':results,'search_terms':search_terms_for_display,'form':SearchForm(initial={'choice_field':results_ordering})})
 
 
 def download(request,doc_id):
