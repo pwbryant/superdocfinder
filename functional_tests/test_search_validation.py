@@ -26,6 +26,7 @@ class SearchValidationTest(FunctionalTest):
         # User enters empty search, and gets and error
         self.browser.get(self.server_url)
         self.get_search_input_box().send_keys('\n')
+        time.sleep(2)
         error = self.get_error_element()
         self.assertTrue(error.is_displayed())
 

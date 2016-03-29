@@ -47,18 +47,18 @@ class SearchResultsTests(TestCase):
 
 
     def test_displays_search_form(self):
-        response = self.client.get('/search/display_results/atrazine/')
+        response = self.client.get('/search/display_results/atrazine_1/')
         self.assertIsInstance(response.context['form'], SearchForm)
         self.assertContains(response, 'name="search_terms"')
 
 
     def test_uses_search_template(self):
-        response = self.client.get("/search/display_results/atrazine_missouri/")
+        response = self.client.get("/search/display_results/atrazine_missouri_1/")
         self.assertTemplateUsed(response, 'search.html')
 
 
     def test_get_search_results_url_resolves_to_get_search_results_view(self):
-        found = resolve('/search/get_search_results/atrazine_missouri/')
+        found = resolve('/search/get_search_results/atrazine_missouri_1/')
         self.assertEqual(found.func, get_search_results)
 
 

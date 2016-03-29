@@ -58,7 +58,6 @@ def get_search_results(request,search_terms):
                 admin_error = 'See Admin about search term(s) "%s"' % search_terms_for_sql
                 return render(request,'search.html',
                         {'admin_error':admin_error,'search_terms':search_terms,'form':form})
-
     return redirect('display_results', search_terms)
 
 
@@ -68,11 +67,10 @@ def display_results(request, search_terms):
     search_terms_for_solr = search_terms[:-2].replace('_','+')
     solr_search = 'title_sf:%s*^6 OR "%s"^3 OR partialSearch:%s^2 OR %s' % (search_terms_for_solr,search_terms_for_solr,search_terms_for_solr,search_terms_for_solr)
 
-
     solr = pysolr.Solr('http://localhost:8983/solr/testcore',timeout=10)
     highlight_params = {'hl':'true','hl.fl':'doc_body_sf','hl.snippets':5,'hl.fragsize':40,'hl.simple.pre':'<b>','hl.simple.post':'</b>'}
     if results_ordering == '2':
-        results = solr.search(solr_search,sort='year desc',**highlight_params).__dict__
+        results = solr.search(solr_search,sort='year_sf desc',**highlight_params).__dict__
     else:
         results = solr.search(solr_search,**highlight_params).__dict__
     for result in results['docs']:
