@@ -43,6 +43,21 @@ class NewVisitorTest(FunctionalTest):
         inputbox = self.get_search_input_box()
         inputbox.send_keys('atrazine')
 
+        #User hits ENTER and  the page is updated with the returned results.        #The user can see the highlighted terms in the search results
+
+        inputbox.send_keys(Keys.ENTER)
+        self.assertRegex(self.browser.current_url,'/search/display_results/')
+        self.check_for_row_in_results_table('Big Time Atrazine Study')
+
+        table = self.browser.find_element_by_id('id_results_div')
+        rows = table.find_elements_by_tag_name('b')
+        self.assertIn('atrazine',[row.text for row in rows])
+
+        #she types in 'atraz' and hits enter to get all docs regarding 
+        #atrazine.
+        inputbox = self.get_search_input_box()
+        inputbox.send_keys('atraz')
+
         #User hits ENTER and  the page is updated with the returned results. 
         inputbox.send_keys(Keys.ENTER)
         self.assertRegex(self.browser.current_url,'/search/display_results/')
@@ -112,6 +127,5 @@ class NewVisitorTest(FunctionalTest):
         self.browser.find_element_by_id("search_result_%s" % doc.doc_id).click()
         input()
         downloaded_file = open(self.DOWNLOAD_DIR + '/test.csv','r')
-
 
 
