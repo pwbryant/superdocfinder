@@ -10,7 +10,7 @@
 		<h1>{{ admin_error }}</h1>
 	{% else %}
 		<h4>Search Results for "{{ search_terms }}"</h4>		
-		{% for result in search_results %}
+		{% for result in search_results.docs %}
 			{% if forloop.first %}<div class="row">{% endif %}
 			<div class="col-md-4">
 				<div class="thumbnail">
@@ -20,6 +20,7 @@
 					<p>{{ result.author_sf }}</p>
 					<b>Year:</b>
 					<p>{{ result.year_sf }}</p>
+					<p>{{ result.highlighting | safe }}</p>
 					<button type="button" class="btn btn-info btn-sm" data-toggle="modal" data-target="#myModal{{ result.id }}"><span class="glyphicon glyphicon-eye-open">Abstract</span></button>
 					<div class="modal fade" id="myModal{{ result.id }}" role="dialog">
 						<div class="modal-dialog">
