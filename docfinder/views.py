@@ -50,6 +50,7 @@ def get_search_results(request,search_terms):
     if len(results) > 0:
         for solr_result in results:
             document_objects = Document.objects.filter(doc_id = solr_result['sid'][0])
+
             if len(document_objects) > 0:
                 document = document_objects[0]
                 Result.objects.create(doc_id = document, searches_id = searches)

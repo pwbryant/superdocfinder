@@ -27,6 +27,31 @@ class HomePageTest(TestCase):
 
 class SearchResultsTests(TestCase):
 
+    def test_get_search_results_veiw_redirects_correctly_after_being_called_using_partial_word(self):
+        request = HttpRequest()
+        search = Search(search_terms = 'atra')
+        search.save()
+        Document.objects.create(doc_id='1')
+        search_terms_url = 'atra_1'
+        response = get_search_results(request,search_terms_url)
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response['location'],'/search/display_results/%s/' % search_terms_url)
+
+
+    def test_get_search_results_handles_partial_word_searches_and_matches_to_correct_Doc_gens_Result(self):
+        Search.objects.create(search_terms = 'atraz')
+        doc = Document.objects.create(doc_id = '1', filename = 'test.csv', author="Paul Bryant", title = "Here is the atrazine title")
+        self.assertEquals(Result.objects.count(),0)
+        response = self.client.get("/search/get_search_results/atraz_1")
+        self.assertEquals(Result.objects.count(),1)
+        result = Result.objects.all()[0]
+        self.assertEquals(result.doc_id,doc)
+
+    def test_display_results_handles_partial_search(self):
+        request = HttpRequest()
+        response = display_results(request,'atra_1')
+        self.assertIn('<b>atrazine</b>',response.content.decode())
+
     def test_display_results_in_correct_order(self):
 
         #not sorted
